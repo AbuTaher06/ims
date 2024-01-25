@@ -16,7 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" integrity="sha512-uKQ39gEGiyUJl4AI6L+ekBdGKpGw4xJ55+xyJG7YFlJokPNYegn9KwQ3P8A7aFQAUtUsAQHep+d/lrGqrbPIDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-info bg-info">
+<nav class="navbar navbar-expand-md navbar-dark bg-info">
         <img src="../images/jkkniu.png" height="50px" alt="" class="mx-1">
         <img src="include/jkkniu.png" height="50px" alt="" class="mx-1">
         

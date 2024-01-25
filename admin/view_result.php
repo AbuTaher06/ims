@@ -196,7 +196,7 @@ session_start();
             echo  "<p style='color:red;text-align:center'>Nothing Found</p>";
         }
     ?>
-        <p style="float:left; text-align:right;margin:20px 0;width:49%"><a href="st_result_update.php?ar=<?php echo $id ?>&seme=<?php echo $semester ?>&vn=<?php echo $row['username']; ?>"><button class="btn btn-success">Edit Result</button></a></p>
+        <p style="float:left; text-align:right;margin:20px 0;width:49%"><a href="st_result_update.php?id=<?php echo $row['id'] ?>&seme=<?php echo $semester ?>&name=<?php echo $row['username']; ?>"><button class="btn btn-success">Edit Result</button></a></p>
     <?php
     }
     ?>
