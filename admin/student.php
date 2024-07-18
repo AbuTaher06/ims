@@ -58,6 +58,9 @@ session_start();
                     ?>
 
                     <!-- Dropdown to filter students by session -->
+                    <div class="card">
+                        <div class="card-body">
+                    
                     <form method="post" style="margin-bottom: 20px;">
                         <label for="session"><h3>Select session:</h3></label>
                         <select name="session" id="session" class="form-control" onchange="this.form.submit()">
@@ -69,6 +72,7 @@ session_start();
                             }
                             ?>
                         </select>
+                        
                     </form>
 
                     <?php
@@ -148,6 +152,8 @@ session_start();
                     ?>
                 </div>
             </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -158,6 +164,9 @@ session_start();
             $('#studentTable').DataTable();
         });
     </script>
+     <?php 
+        include("../footer.php");
+        ?>
 </body>
 
 </html>

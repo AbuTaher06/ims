@@ -21,7 +21,7 @@ if (isset($_POST['admin_id'])) {
 
 <body>
     <?php
-    include("../include/header.php");
+    include("header.php");
     ?>
 
     <div class="container-fluid">
@@ -141,7 +141,9 @@ if (isset($_POST['admin_id'])) {
             </div>
         </div>
     </div>
-
+    <?php 
+        include("../footer.php");
+        ?>
 </body>
 
 </html>

@@ -8,7 +8,7 @@ session_start();
     </head>
     <body>
         <?php
-            include("../include/header.php");
+           // include("../include/header.php");
             include("../include/connect.php");
             $ad=$_SESSION['admin'];
             $sql="SELECT * FROM admin WHERE username='$ad'";
@@ -23,15 +23,12 @@ session_start();
             <div class="col-md-12">
                 <div class="row">
                     <div class="col-md-2" style="margin-left:-30px;">
-                        <?php
-                     include("sidenav.php");
-                        ?>
-                    </div>
+                      
                     <div class="col-md-10">
                         <div class="col-md-12">
                             <div class="row">
                                  <div class="col-md-6">
-                                        <h4><?php echo $username;?> Profile</h4>
+                                        <h4><?php echo $username."'s";?> Profile</h4>
                                         <?php
                                             if(isset($_POST['update'])){
                                                 $profile=$_FILES['profile']['name'];
@@ -50,20 +47,19 @@ session_start();
                                         ?>
                                         <form method="post" enctype="multipart/form-data">
                                             <?php
-                                            echo "<img src='img/$profile' class='col-md-12' style='height: 150px ;'>";
+                                        echo "<img src='img/$profile' class='img-fluid col-md-12' style='max-width: 50%; height: auto; max-height: 150px;'>";
+
+
                                             ?>
                                             <br><br>
                                             <div class="form-group">
-                                                <label>UPDATE PROFILE</label>
+                                                <label>Update Profile Picture</label>
                                                 <input type="file" name="profile" class="form-control">
                                             </div>
-                                            <br>
                                             <input type="submit" name="update" value="UPDATE" class="btn btn-success">
                                         </form>
-                                 </div>
-
-                                 <div class="col-md-6">
-                                    <?php
+                                        <hr>
+                                        <?php
                                         if(isset($_POST['change'])){
                                             $uname=$_POST['uname'];
                                             if(empty($uname)){
@@ -77,15 +73,20 @@ session_start();
                                             }
                                         }
                                     ?>
-
+                     
                                  <form method="post">
                                     <label>Change Username</label>
                                     <input type="text" name="uname" class="form-control" autocomplete="off"><br>
                                     <input type="submit" name="change" class="btn btn-success" value="Change">
                                  </form>
+                               
                                  <br>
+                                 </div>
+
+                                 <div class="col-md-6">
+                                    
                                 
-                                 <?php
+                                 <!-- <?php
                                     if(isset($_POST['update_pass'])){
                                         $old_pass=$_POST['old_pass'];
                                         $new_pass=$_POST['new_pass'];
@@ -138,25 +139,25 @@ session_start();
                                     
                                     <div class="form-group">
                                     <label>Old Password</label>
-                                    <input type="password" name="old_pass" class="form-control" autocomplete="off"><br>
+                                    <input type="password" name="old_pass" class="form-control" autocomplete="off">
     
                                     </div>
 
                                     <div class="form-group">
                                     <label>New Password</label>
-                                    <input type="password" name="new_pass" class="form-control" autocomplete="off"><br>
+                                    <input type="password" name="new_pass" class="form-control" autocomplete="off">
     
                                     </div>
 
                                     <div class="form-group">
                                     <label>Confirm Password</label>
-                                    <input type="password" name="con_pass" class="form-control" autocomplete="off"><br>
+                                    <input type="password" name="con_pass" class="form-control" autocomplete="off">
     
                                     </div>
 
-                                    <input type="submit" name="update_pass" class="btn btn-secondary" value="Update Password">
+                                    <input type="submit" name="update_pass" class="btn btn-success" value="Update Password">
 
-                                 </form>
+                                 </form> -->
 
                                  </div>
                             </div>
@@ -166,5 +167,8 @@ session_start();
 
             </div>
         </div>
+        <?php 
+        include("../footer.php");
+    ?>
     </body>
 </html>

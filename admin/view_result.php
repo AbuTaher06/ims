@@ -205,5 +205,7 @@ session_start();
 			<p style="float:right;text-align:left;margin:20px 0;width:49%"><a href="student.php"><button class="btn btn-success">Back to list</button></a></p>
 
 </div>
-<!-- <?php include "php/footerbottom.php";?> -->
+<?php 
+        include("../footer.php");
+        ?>
 <?php ob_end_flush() ; ?>

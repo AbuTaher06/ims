@@ -1,5 +1,5 @@
 <?php
-session_start();
+     session_start();
 include("include/connect.php");
 
 if(isset($_POST['login'])){
@@ -10,7 +10,7 @@ if(isset($_POST['login'])){
     $q="SELECT * FROM students WHERE username='$uname' AND password='$password'";
     $qq=mysqli_query($conn,$q);
     $row=mysqli_fetch_array($qq);
- 
+    $e=$row['email'];
     if(empty($uname)){
         $error['login']="Enter Username";
     }
@@ -23,17 +23,17 @@ if(isset($_POST['login'])){
 
 
     if(count($error)==0){
-        $sql="SELECT * FROM students WHERE username='$uname' AND password='$password'";
+        $sql = "SELECT * FROM students WHERE username='$uname' AND password='$password' AND email='$e' AND status='Active'";
+
         $result=mysqli_query($conn,$sql);
         if(mysqli_num_rows($result)){
-            echo "<script>alert('Done')</script>";
-           
-            echo "<script>alert('Done')</script>";
+            echo "<script>alert('Logged in successfuly')</script>";
+            
             header("Location:student/index.php");
-            $_SESSION['student']=$uname;
+            $_SESSION['students']=$uname;
             
         }else{
-            echo "<script>alert('Invalid Account')</script>";
+            echo "<script>alert('Invalid Account or You are not verified')</script>";
         }
     }
    
@@ -51,12 +51,10 @@ else{
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Patien Login page</title>
+        <title>Student Login page</title>
     </head>
     <body style="background-image:url(images/student.jpeg); background-repeat:no-repeat;">
-        <?php
-            include("include/header.php");
-        ?>
+    <?php include("include/header.php"); ?>
         <div class="container-fluid">
         <div class="col-md-12">
             <div class="row">
@@ -64,10 +62,12 @@ else{
                     
                 </div>
                 <div class="col-md-6 my-5 jumbotron">
-                    <h5 class="text-center my-3">student Login</h5>
+                    <h5 class="text-center my-3">Login your account</h5>
                     <?php
                         echo $show;
                     ?>
+                    <div class="card">
+                        <div class="card-body">
                         <form method="post">
                             <div class="form-group">
                             <label>Username</label>
@@ -79,10 +79,14 @@ else{
                             <input type="password" name="pass" class="form-control" placeholder="Enter Password">
                             </div>
 <br>
-                            <input type="submit" name="login" class="btn btn-success" value="login">
-                            <p>Don't have any account?<a href="account.php">Register Here</a></p>
+                            <input type="submit" name="login" class="btn btn-success btn-block" value="Sign in">
+                            <p>Don't have any account?<a href="./student/register.php">Register Here</a></p>
+                            <p><a href="./student/forgot_password.php" class="text-danger">Forgot Password</a></p>
                         </form>
 
+                        </div>
+                    </div>
+                        
 
                 </div>
                 <div class="col-md-6">
@@ -91,6 +95,8 @@ else{
             </div>
         </div>
     </div>
-
+    <?php 
+        include("footer.php");
+    ?>
     </body>
 </html>

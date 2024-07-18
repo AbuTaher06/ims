@@ -12,21 +12,24 @@
             include("include/header.php");
             include("include/connect.php")
         ?>
-
+    <img src="./images/library.jpg" width="100%" style="height:880px;border-bottom:3px solid white;">
     <div class="container-fluid">
         <div class="col-md-12">
+            
             <div class="row">
                 <div class="col-md-2" style="margin-left:-30px;">
-                    <?php
-                        include("include/sidenav.php");
-                    ?>
+                   <!-- sidenav -->
                 </div>
                 <div class="col-md-10">
                         <h5 class="text-center my-2"></h5>
                 </div>
             </div>
         </div>
+      
     </div>
+    <?php
+        include("./footer.php")
+        ?>
 </body>
 </html>
 

@@ -131,5 +131,7 @@ table.tab_two tr:hover{
 				<p style="text-align:center"><a href="student.php"><button class="btn btn-secondary font-weight-bolder">Back to list</button></a></p>
 			</div>
 </div>
-
+<?php 
+        include("../footer.php");
+        ?>
 <?php ob_end_flush() ; ?>

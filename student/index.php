@@ -1,6 +1,4 @@
-<?php
-session_start();
-?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -9,7 +7,7 @@ session_start();
 
     <body>
         <?php
-            include("../include/header.php");
+            include("header.php");
             include("../include/connect.php");
         ?>
 
@@ -22,7 +20,7 @@ session_start();
                     ?>
                 </div>
                 <div class="col-md-10">
-                        <h5 class="my-3 text-center">Student Dashboard</h5>
+                        <h5 class="my-3 text-center">My Dashboard</h5>
                
                 <div class="col-md-12">
                     <div class="row">
@@ -40,78 +38,98 @@ session_start();
                                 </div>
                             </div>
                     </div>
-                        <div class="col-md-3 bg-warning mx-2" style="height:150px;">
+                    <div class="col-md-3 bg-warning mx-2" style="height:150px;">
+                        <class="col-md-12">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h5 class="text-white my-4">Request for improvement</h5>
+                                    </div>
+                                    <div class="col-md-4">
+                                            <a href="improvement_form.php">
+                                                <i class="fas fa-user-plus fa-3x my-4" style="color:white;"></i>
+                                            </a>
+                                    </div>
+                                </div>
+                            
+                    </div>
+
+                    </div>
+                    <div class="row">
+                    <div class="col-md-3 bg-danger mx-2 my-2" style="height:150px;">
                         <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-8">
                                         <h5 class="text-white my-4">My Pending Request</h5>
                                     </div>
                                     <div class="col-md-4">
-                                            <a href="appointment.php">
-                                                <i class="fa fa-calendar fa-3x my-4" style="color:white;"></i>
+                                            <a href="pending_request.php">
+                                                <i class="fa fa-clock fa-3x my-4" style="color:white;"></i>
                                             </a>
                                     </div>
                                 </div>
                             </div>
                     </div>
-                        <div class="col-md-3 bg-success mx-2" style="height:150px;">
-                        <div class="col-md-12">
+                    <div class="col-md-3 bg-success mx-2 my-2" style="height:150px;">
+                        <class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-8">
                                         <h5 class="text-white my-4">My Improvement</h5>
                                     </div>
                                     <div class="col-md-4">
-                                            <a href="invoice.php">
-                                                <i class="fa fa-file-invoice-dollar fa-3x my-4" style="color:white;"></i>
+                                            <a href="improvement.php">
+                                                <i class="fas fa-check-circle fa-3x my-4" style="color:white;"></i>
                                             </a>
                                     </div>
                                 </div>
-                            </div>
+                            
                     </div>
                     </div>
+                        
+                    </div>
+
+                    
                     </div>
                     <?php
-                        if(isset($_POST['send'])){
-                            $title=$_POST['title'];
-                            $message=$_POST['msg'];
+                             $student=$_SESSION['students'];
+                             $query="SELECT * FROM students WHERE username='$student'";
+                         
+                             $res=mysqli_query($conn,$query);
+                             $row=mysqli_fetch_array($res);
+                            $name=$row['name'];
+                            $student_id=$row['stud_id'];
+                            $session=$row['session'];
+                        
+                    
+                  
 
-                            if(empty($title)){
+                    if(isset($_POST['send'])){
+                        $title = $_POST['title'];
+                        $code = $_POST['code'];
+                        $credit = $_POST['credit'];
+                        $semester=$_POST['semester'];
 
-                            }else if(empty($message)){
-
-                            }else{
-                                $user=$_SESSION['student'];
-                                $query="INSERT INTO report(title,message,username,date_send) VALUES('$title','$message','$user',NOW())";
-                                $res=mysqli_query($conn,$query);
-                                if($res){
-                                    echo "<script>alert('You have sent your Report')</script>";
-                                }
+                        if(empty($title) || empty($code) || empty($credit)){
+                            echo "<script>alert('Please fill in all fields')</script>";
+                        } else {
+                            $user = $_SESSION['students'];
+                            $query = "INSERT INTO improvement_requested (name,username,student_id,session,course_title, course_code, credit_hour,semester) 
+                                    VALUES ('$name','$student','$student_id','$session','$title', '$code', '$credit','$semester')";
+                            $res = mysqli_query($conn, $query);
+                            if($res){
+                                echo "<script>alert('Your request has been sent.')</script>";
+                            } else {
+                                echo "<script>alert('Failed to send your request.')</script>";
                             }
                         }
-
-                        ?>
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-3"></div>
-                                <div class="col-md-6 jumbotron bg-info my-5">
-                                    <h5 class="text-center my-2">Send A Report</h5>
-
-                                    <form method="post">
-                                        <label>Title</label>
-                                        <input type="text" name="title" autocomplete="off" class="form-control" placeholder="Enter title of the Report">
-                                        <label>Message</label>
-                                        <input type="text" name="msg" autocomplete="off" class="form-control" placeholder="Enter Message">
-
-                                        <input type="submit" name="send" value="Send Report" class="btn btn-success my-2">
-                                    </form>
-                                    <div class="col-md-3"></div>
-                               
-                            </div>
-                        </div>
+                    }
+                ?>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <?php 
+        include("../footer.php");
+    ?>
     </body>
 </html>
