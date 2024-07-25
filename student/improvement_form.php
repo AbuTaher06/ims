@@ -511,7 +511,7 @@ document.getElementById('readmissionSemester').addEventListener('input', functio
         rows.forEach((row, index) => {
             row.querySelector('input[name*="[serialNo]"]').value = index + 1;
         });
-    }
+    } 
 // expandable only for course table
     document.querySelectorAll('#courseTable input[type="text"], #courseTable input[type="number"]').forEach(input => {
         input.addEventListener('input', function() {
