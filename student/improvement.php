@@ -1,17 +1,10 @@
 <?php
-session_start();
-
-// Include database connection
+$pageTitle = "Home";
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <title>View Students</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .form-card {
             max-width: 500px;
@@ -22,25 +15,16 @@ include("../include/connect.php");
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
     </style>
-</head>
-
-<body>
-
-    <?php
-    include("header.php");
-    ?>
-
+<main id="main" class="main">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-2" style="margin-left: -30px;">
-                <?php include("sidenav.php"); ?>
-            </div>
+         
 
             <div class="col-md-10">
                 <div class="container">
                     <?php
-                    $student = $_SESSION['students'];
-                    $q = "SELECT * FROM students WHERE username='$student'";
+                    $student = $_SESSION['student'];
+                    $q = "SELECT * FROM students WHERE email='$student'";
                     $res = mysqli_query($conn, $q);
                     $r = mysqli_fetch_array($res);
                     $student_id = $r['stud_id'];
@@ -109,10 +93,8 @@ include("../include/connect.php");
             </div>
         </div>
     </div>
-
+    </main>
     <?php
-    include("../footer.php")
+    include("footer.php")
     ?>
-</body>
-
-</html>
+<

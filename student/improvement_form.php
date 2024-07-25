@@ -1,23 +1,19 @@
-<?php 
+<?php
 session_start();
+$pageTitle = "Submit";
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
+include("../include/connect.php");
 ?>
-<!DOCTYPE html>
-<html>
-    <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
-    <!-- Include jQuery (for AJAX submission) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
  
     <style>
           body, html {
             height: 100%;
         }
-
+        #courseTable input[type="text"], #courseTable input[type="number"] {
+            min-width: 100px; /* Minimum width */
+            transition: width 0.2s;
+        }
         .container {
             display: flex;
             justify-content: center;
@@ -33,7 +29,7 @@ session_start();
 <body style="font-family: 'Noto Sans Bengali UI', sans-serif;">
 <?php
 include("../include/connect.php");
-$uname=$_SESSION['students'];
+$uname=$_SESSION['student'];
 if (isset($_POST['submit'])) {
     // Extract form data
     $department = $_POST['department'];
@@ -86,6 +82,7 @@ if (isset($_POST['submit'])) {
     }
 }
 ?>
+<main id="main" class="main">
 <div style="text-align: center;">
     <h4 style="margin-bottom: -6px;">পরীক্ষা নিয়ন্ত্রক দপ্তর</h4>
     <div style="display: inline-block;">
@@ -99,19 +96,47 @@ if (isset($_POST['submit'])) {
 <hr style="border-top: 2px solid;">
 <h4 style="text-align: center;">ফলোন্নয়ন/এফ গ্রেড থেকে উন্নয়ন পরীক্ষার অনুমোদনের আবেদন ফরম</h4>
 
-                <div class="card-body">
+    <div class="card-body">
     <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-        <div class="card">
+        <div class="card ">
                 <div class="card-body">
             <h3 class="text-center mb-4">পরীক্ষার্থী কর্তৃক পূরণীয়</h3>
 
             <form id="submissionForm" action="" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
-                    <label for="department" class="form-label">১। বিভাগ:</label>
-                    <input type="text" class="form-control" id="department" name="department" placeholder="আপনার বিভাগ লিখুন" required>
-                </div>
+            <div class="mb-3">
+                <label for="department" class="form-label">১। বিভাগ:</label>
+                <select class="form-select" id="department" name="department" required>
+                    <option selected disabled>Select your department</option>
+                    <option value="COMPUTER SCIENCE AND ENGINEERING">Computer Science and Engineering</option>
+                    <option value="ELECTRICAL AND ELECTRONIC ENGINEERING">Electrical and Electronic Engineering</option>
+                    <option value="ENVIRONMENTAL SCIENCE AND ENGINEERING">Environmental Science and Engineering</option>
+                    <option value="STATISTICS">Statistics</option>
+                    <option value="BANGLA LANGUAGE AND LITERATURE">Bangla Language and Literature</option>
+                    <option value="ENGLISH LANGUAGE AND LITERATURE">English Language and Literature</option>
+                    <option value="ECONOMICS">Economics</option>
+                    <option value="PUBLIC ADMINISTRATION AND GOVERNANCE STUDIES">Public Administration and Governance Studies</option>
+                    <option value="FOLKLORE">Folklore</option>
+                    <option value="LAW AND JUSTICE">Law and Justice</option>
+                    <option value="ANTHROPOLOGY">Anthropology</option>
+                    <option value="POPULATION SCIENCE">Population Science</option>
+                    <option value="LOCAL GOVERNMENT AND URBAN DEVELOPMENT">Local Government and Urban Development</option>
+                    <option value="PHILOSOPHY">Philosophy</option>
+                    <option value="SOCIOLOGY">Sociology</option>
+                    <option value="HISTORY">History</option>
+                    <option value="MUSIC">Music</option>
+                    <option value="FINE ARTS">Fine Arts</option>
+                    <option value="THEATRE AND PERFORMANCE STUDIES">Theatre and Performance Studies</option>
+                    <option value="FILM AND MEDIA STUDIES">Film and Media Studies</option>
+                    <option value="ACCOUNTING AND INFORMATION SYSTEMS">Accounting and Information Systems</option>
+                    <option value="FINANCE AND BANKING">Finance and Banking</option>
+                    <option value="HUMAN RESOURCE MANAGEMENT">Human Resource Management</option>
+                    <option value="MANAGEMENT">Management</option>
+                    <option value="MARKETING">Marketing</option>
+                </select>
+            </div>
+
                 <div class="mb-3">
                     <label for="studentNameBangla" class="form-label">২। ক) নাম (বাংলা):</label>
                     <input type="text" class="form-control" id="studentNameBangla" name="studentNameBangla" placeholder="আপনার বাংলা নাম লিখুন" required>
@@ -147,80 +172,107 @@ if (isset($_POST['submit'])) {
    
 
 
-<div class="mb-3">
-    <label for="currentSemester" class="form-label">৬। বর্তমান সেমিস্টার:</label>
-    <input type="text" class="form-control" id="currentSemester" name="currentSemester" placeholder="আপনার বর্তমান  সেমিস্টার লিখুন" required>
-</div>
+            <div class="mb-3">
+                <label for="currentSemester" class="form-label">৬। বর্তমান সেমিস্টার:</label>
+                <select class="form-control" id="currentSemester" name="currentSemester" required>
+                    <option value="" disabled selected>আপনার বর্তমান সেমিস্টার নির্বাচন করুন</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                    <option value="3rd">3rd</option>
+                    <option value="4th">4th</option>
+                    <option value="5th">5th</option>
+                    <option value="6th">6th</option>
+                    <option value="7th">7th</option>
+                    <option value="8th">8th</option>
+                </select>
+            </div>
 
-                <div class="mb-3">
-                    <label for="readmissionSemester" class="form-label">৭। পুনঃ ভর্তি হলে, শিক্ষাবর্ষ ও সেমিস্টার লিখুন (যদি প্রযোজ্য হয়):</label>
-                    <input type="text" class="form-control" id="readmissionSemester" name="readmissionSemester" placeholder="পুনঃ ভর্তি হলে শিক্ষাবর্ষ ও সেমিস্টার লিখুন (যদি প্রযোজ্য হয়)">
-                </div>
+
+                     
+            <div class="mb-3">
+                <label for="readmissionSemester" class="form-label">৭। পুনঃ ভর্তি হলে, শিক্ষাবর্ষ ও সেমিস্টার লিখুন (যদি প্রযোজ্য হয়):</label>
+                <input type="text" class="form-control" id="readmissionSemester" name="readmissionSemester" 
+                    placeholder="Example: 2019-2020 & 3rd" required>
+                <div id="error-message" class="text-danger" style="display: none;">দয়া করে সঠিক ফরম্যাটে লিখুন (যেমন: 2019-2020 & 3rd).</div>
+            </div>
                 <div class="mb-3">
                     <label for="examRoll" class="form-label">৮। পরীক্ষার রোল নম্বর:</label>
                     <input type="text" class="form-control" id="examRoll" name="examRoll" placeholder="আপনার পরীক্ষার রোল নম্বর লিখুন">
                 </div>
                 <div class="mb-3">
                     <label for="mobileNumber" class="form-label">৯। মোবাইল নম্বর:</label>
-                    <input type="text" class="form-control" id="mobileNumber" name="mobileNumber" placeholder="আপনার মোবাইল নম্বর লিখুন">
+                    <input type="text" class="form-control" id="mobileNumber" name="mobileNumber" 
+                        placeholder="আপনার মোবাইল নম্বর লিখুন" required>
+                    <div id="phone-error-message" class="text-danger" style="display: none;">দয়া করে সঠিক মোবাইল নম্বর লিখুন (যেমন: 01XXXXXXXXX).</div>
                 </div>
+
                 <div class="mb-3">
                             <label for="publish_date" class="form-label">সংশ্লিষ্ট পরীক্ষার ফলাফল প্রকাশের তারিখ:</label>
                             <input type="date" class="form-control" id="publish_date" name="publish_date" required>
                         </div>
-                <div class="mb-3">
+                    
     <label for="courseDetails" class="form-label">১০। যে সকল কোর্সে ফলোন্নয়ন/এফ গ্রেড থেকে উন্নয়ন পরীক্ষায় অংশগ্রহণ করতে ইচ্ছুক তার বিবরণ:</label>
-    <table class="table table-bordered">
-    <thead>
-        <tr class="bg-primary text-white">
-            <th scope="col">ক্রমিক নং</th>
-            <th scope="col">বর্ষ</th>
-            <th scope="col">সেমিস্টার</th>
-            <th scope="col">কোর্স কোড</th>
-            <th scope="col">কোর্স ক্রেডিট</th>
-            <th scope="col">কোর্স শিরোনাম</th>
-            <th scope="col">প্রাপ্ত জিপিএ</th>
-            <th scope="col">পরীক্ষার ধরণ</th>
-        </tr>
-    </thead>
-    <tbody>
-                        <tr>
-                            <td><input type="number" class="form-control" name="courseDetails[0][serialNo]" required></td>
-                            <td><input type="text" class="form-control" name="courseDetails[0][year]" onchange="updateSelectedYear(this.value)" required></td>
-                            <td><input type="text" class="form-control" name="courseDetails[0][semester]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[0][courseCode]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[0][courseCredit]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[0][courseTitle]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[0][gpaObtained]"></td>
-                            <td>
-                                <select class="form-select" name="courseDetails[0][examType]" required>
-                                    <option value="" disabled selected>Select Exam Type</option>
-                                    <option value="Improvement">Improvement</option>
-                                    <option value="Fail">Fail</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><input type="number" class="form-control" name="courseDetails[1][serialNo]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[1][year]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[1][semester]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[1][courseCode]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[1][courseCredit]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[1][courseTitle]"></td>
-                            <td><input type="text" class="form-control" name="courseDetails[1][gpaObtained]"></td>
-                            <td>
-                                <select class="form-select" name="courseDetails[1][examType]">
-                                    <option value="" disabled selected>Select Exam Type</option>
-                                    <option value="Improvement">Improvement</option>
-                                    <option value="Fail">Fail</option>
-                                </select>
-                            </td>
-                        </tr>
-                    </tbody>
-</table>
-<input type="hidden" id="selectedYear" name="selectedYear">
+    <table class="table table-bordered" id="courseTable">
+        <thead>
+            <tr class="bg-primary text-white">
+                <th scope="col">ক্রমিক নং</th>
+                <th scope="col">বর্ষ</th>
+                <th scope="col">সেমিস্টার</th>
+                <th scope="col">কোর্স কোড</th>
+                <th scope="col">কোর্স ক্রেডিট</th>
+                <th scope="col">কোর্স শিরোনাম</th>
+                <th scope="col">প্রাপ্ত জিপিএ</th>
+                <th scope="col">পরীক্ষার ধরণ</th>
+                <th scope="col"><button type="button" class="btn btn-success" id="addRowBtn">Add New Row</button></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" class="form-control" name="courseDetails[0][serialNo]" value="1" readonly></td>
+                <td>
+                    <select class="form-select" name="courseDetails[0][year]" required>
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">১ম</option>
+                        <option value="2">২য়</option>
+                        <option value="3">৩য়</option>
+                        <option value="4">৪র্থ</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[0][semester]" required>
+                        <option value="" disabled selected>Select Semester</option>
+                        <option value="1">১ম</option>
+                        <option value="2">২য়</option>
+                    </select>
+                </td>
+                <td><input type="text" class="form-control" name="courseDetails[0][courseCode]" required></td>
+                <td><input type="number" class="form-control" name="courseDetails[0][courseCredit]" required></td>
+                <td><input type="text" class="form-control" name="courseDetails[0][courseTitle]" required></td>
+                <td><input type="number" step="0.01" class="form-control" name="courseDetails[0][gpaObtained]" required></td>
+                <td>
+                    <select class="form-select" name="courseDetails[0][examType]" required>
+                        <option value="" disabled selected>Select Exam Type</option>
+                        <option value="Improvement">Improvement</option>
+                        <option value="Fail">Fail</option>
+                    </select>
+                </td>
+                <td><button type="button" class="btn btn-danger removeRowBtn">Remove</button></td>
+            </tr>
+        </tbody>
+    </table>
 
-</div>
+    <div id="error-message" class="text-danger" style="display: none;"></div>
+
+
+
+                       
+
+                
+
+            
+                <input type="hidden" id="selectedYear" name="selectedYear">
+
+                </div>
 
                 <div class="mb-3">
                     <label for="declaration" class="form-label">বিনীত নিবেদক:</label>
@@ -373,12 +425,7 @@ $nextSession = $nextStartingYear . '-' . $nextEndingYear;
                   </button>
                 </div>
               </div>
-<!-- Your PHP code to calculate the previous session -->
-<!-- <div class="text-center">
-                        <button class="btn btn-primary" onclick="window.print()">Print</button>
-                    </div> -->
 
-<!-- Rest of your HTML form -->
 
 
 <!-- Include jQuery -->
@@ -386,6 +433,102 @@ $nextSession = $nextStartingYear . '-' . $nextEndingYear;
 
 <!-- AJAX Script to Submit Form and Generate PDF -->
 <script>
+document.getElementById('readmissionSemester').addEventListener('input', function() {
+        const input = this.value;
+        const pattern = /^\d{4}-\d{4} & \d+(?:[a-zA-Z]+)?$/; // Pattern for "YYYY-YYYY & Xth"
+
+        const errorMessage = document.getElementById('error-message');
+        if (!pattern.test(input)) {
+            errorMessage.style.display = 'block';
+        } else {
+            errorMessage.style.display = 'none';
+        }
+    });
+
+    document.getElementById('mobileNumber').addEventListener('input', function() {
+        const input = this.value;
+        const pattern = /^01[3-9]\d{8}$/; // Pattern for Bangladeshi mobile numbers
+
+        const errorMessage = document.getElementById('phone-error-message');
+        if (!pattern.test(input)) {
+            errorMessage.style.display = 'block';
+        } else {
+            errorMessage.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('addRowBtn').addEventListener('click', function() {
+        const tableBody = document.querySelector('#courseTable tbody');
+        const rowCount = tableBody.rows.length;
+
+        const newRow = `
+            <tr>
+                <td><input type="number" class="form-control" name="courseDetails[${rowCount}][serialNo]" value="${rowCount + 1}" readonly></td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][year]" required>
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">১ম</option>
+                        <option value="2">২য়</option>
+                        <option value="3">৩য়</option>
+                        <option value="4">৪র্থ</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][semester]" required>
+                        <option value="" disabled selected>Select Semester</option>
+                        <option value="1">১ম</option>
+                        <option value="2">২য়</option>
+                    </select>
+                </td>
+                <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseCode]" required></td>
+                <td><input type="number" class="form-control" name="courseDetails[${rowCount}][courseCredit]" required></td>
+                <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseTitle]" required></td>
+                <td><input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required></td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][examType]" required>
+                        <option value="" disabled selected>Select Exam Type</option>
+                        <option value="Improvement">Improvement</option>
+                        <option value="Fail">Fail</option>
+                    </select>
+                </td>
+                <td><button type="button" class="btn btn-danger removeRowBtn">মুছে ফেলুন</button></td>
+            </tr>
+        `;
+
+        tableBody.insertAdjacentHTML('beforeend', newRow);
+    });
+
+    // Remove row functionality
+    document.querySelector('#courseTable tbody').addEventListener('click', function(event) {
+        if (event.target.classList.contains('removeRowBtn')) {
+            event.target.closest('tr').remove();
+            updateSerialNumbers();
+        }
+    });
+
+    function updateSerialNumbers() {
+        const rows = document.querySelectorAll('#courseTable tbody tr');
+        rows.forEach((row, index) => {
+            row.querySelector('input[name*="[serialNo]"]').value = index + 1;
+        });
+    }
+// expandable only for course table
+    document.querySelectorAll('#courseTable input[type="text"], #courseTable input[type="number"]').forEach(input => {
+        input.addEventListener('input', function() {
+            const tempSpan = document.createElement('span');
+            document.body.appendChild(tempSpan);
+            tempSpan.innerText = this.value || this.placeholder;
+            tempSpan.style.fontSize = getComputedStyle(this).fontSize;
+            tempSpan.style.visibility = 'hidden';
+            tempSpan.style.position = 'absolute';
+            const width = tempSpan.offsetWidth + 20; // Add some padding
+            this.style.width = `${width}px`;
+            document.body.removeChild(tempSpan);
+        });
+    });
+
+    //update session
+
     function updatenextSession() {
         var currentSession = document.getElementById("currentSession").value;
         var currentSessionParts = currentSession.split("-");
@@ -410,5 +553,4 @@ $nextSession = $nextStartingYear . '-' . $nextEndingYear;
     });
   
 </script>
-</body>
-</html>
+</main>

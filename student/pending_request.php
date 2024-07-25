@@ -1,29 +1,32 @@
 <?php
 session_start();
-include("header.php");
+$pageTitle = "Pending";
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
 
-// Fetch data from the 'imp_form' table where status is 'Pending'
-$student = isset($_SESSION['students']) ? $_SESSION['students'] : '';
+// Fetch data from the 'imp_form' table where status is 'Pending' and course_details is not null
+$student = isset($_SESSION['student']) ? $_SESSION['student'] : '';
 if (empty($student)) {
     die("No student session data found.");
 }
 
-$sql = "SELECT course_details FROM imp_form WHERE student_name_english='$student' AND course_details <> '' AND status='Pending'";
-$res = mysqli_query($conn, $sql);
+// Prepare the SQL statement
+$sql = "SELECT * FROM imp_form WHERE email=? AND status='Pending' AND course_details IS NOT NULL";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, 's', $student);
+mysqli_stmt_execute($stmt);
+$res = mysqli_stmt_get_result($stmt);
 
 // Check for SQL errors
 if (!$res) {
     die("Error executing query: " . mysqli_error($conn));
 }
-
 ?>
+<main id="main" class="main">
 <div class="container-fluid">
     <div class="col-md-12">
         <div class="row">
-            <div class="col-md-2" style="margin-left: -30px;">
-                <?php include("sidenav.php"); ?>
-            </div>
             <div class="col-md-10">
                 <h4 class="text-danger text-center my-2">
                     Your Pending Request
@@ -47,7 +50,7 @@ if (!$res) {
                                         <th>Credit</th>
                                         <th>Course Title</th>
                                         <th>GPA Obtained</th>
-                                        <th>Exam Type</th>
+                                       
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -64,15 +67,15 @@ if (!$res) {
 
                                 foreach ($course_details as $course) {
                                     // Check if all fields are present and serial number is not empty
-                                    if (!empty($course['serialNo']) && !empty($course['year']) && !empty($course['semester']) && !empty($course['courseCode']) && !empty($course['courseCredit']) && !empty($course['courseTitle']) && !empty($course['gpaObtained']) && !empty($course['examType'])) {
+                                    if (!empty($course['serialNo']) && !empty($course['semester']) && !empty($course['courseNo']) && !empty($course['courseTitle']) && !empty($course['gradeObtained'])) {
                                         $serial_no = htmlspecialchars($course['serialNo']);
-                                        $year = htmlspecialchars($course['year']);
+                                        $year = htmlspecialchars($row['current_semester']); // Assuming 'current_semester' is the year
                                         $semester = htmlspecialchars($course['semester']);
-                                        $course_code = htmlspecialchars($course['courseCode']);
-                                        $credit = htmlspecialchars($course['courseCredit']);
+                                        $course_code = htmlspecialchars($course['courseNo']);
                                         $course_title = htmlspecialchars($course['courseTitle']);
-                                        $gpa = htmlspecialchars($course['gpaObtained']);
-                                        $exam_type = htmlspecialchars($course['examType']);
+                                        $gpa = htmlspecialchars($course['gradeObtained']);
+                                       // Assuming you have 'exam_type' in your row
+
                                         // Output table row
                                         echo "
                                         <tr>
@@ -80,10 +83,10 @@ if (!$res) {
                                             <td>$year</td>
                                             <td>$semester</td>
                                             <td>$course_code</td>
-                                            <td>$credit</td>
+                                            <td></td> <!-- Assuming credit is not provided in your JSON -->
                                             <td>$course_title</td>
                                             <td>$gpa</td>
-                                            <td>$exam_type</td>
+                                            
                                         </tr>
                                         ";
                                     }
@@ -99,4 +102,5 @@ if (!$res) {
         </div>
     </div>
 </div>
-<?php include("../footer.php"); ?>
+</main>
+<?php include("footer.php"); ?>

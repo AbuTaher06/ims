@@ -51,10 +51,10 @@ include("../include/connect.php");
                 <li class="nav-item dropdown">
                     <?php
                     // Check if user is logged in
-                    if (isset($_SESSION['students'])) {
-                        $user = $_SESSION['students'];
+                    if (isset($_SESSION['student'])) {
+                        $email = $_SESSION['student'];
                         // Query to fetch profile picture URL from admin table based on username
-                        $query = "SELECT profile FROM students WHERE username = '$user'";
+                        $query = "SELECT * FROM students WHERE email = '$user'";
                         $result = mysqli_query($conn, $query);
                     
                         // Check if query was successful and if profile picture exists
@@ -68,7 +68,7 @@ include("../include/connect.php");
                     
                         // Output the dropdown menu with profile picture and username
                         echo '<a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="./img/' . $profile_picture_url . '" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px;">
+                        <img src="../admin/uploads/' . $profile_picture_url . '" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px;">
                         '.$user.'
                       </a>';
                 
