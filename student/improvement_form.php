@@ -31,6 +31,7 @@ include("../include/connect.php");
 include("../include/connect.php");
 $uname=$_SESSION['student'];
 if (isset($_POST['submit'])) {
+    $email=$_SESSION["student"];
     // Extract form data
     $department = $_POST['department'];
     $studentNameBangla = $_POST['studentNameBangla'];
@@ -46,6 +47,7 @@ if (isset($_POST['submit'])) {
     $date = isset($_POST['date']) ? $_POST['date'] : '';
 
     // Check if the photo file is uploaded
+    /*
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
         $photo = $_FILES['photo']['tmp_name']; // Temporary path of uploaded photo
         $photoData = file_get_contents($photo);
@@ -54,7 +56,7 @@ if (isset($_POST['submit'])) {
         // Handle the error or set a default value
         $photoData = null;
     }
-
+*/
     // Access examType from courseDetails
     $courseDetailsArray = $_POST['courseDetails'];
     $examType = json_encode(array_column($courseDetailsArray, 'examType'));
@@ -63,9 +65,9 @@ if (isset($_POST['submit'])) {
 
     // Prepare SQL statement to insert data into the database
     $sql = "INSERT INTO imp_form(
-        department, student_name_bangla, student_name_english, father_name, mother_name, current_semester, readmission_semester, exam_roll, mobile_number, course_details, date, photo, signature, exam_type
+        department,email, student_name_bangla, student_name_english, father_name, mother_name, current_semester, readmission_semester, exam_roll, mobile_number, course_details, date, exam_type
     ) VALUES (
-        '$department', '$studentNameBangla', '$studentNameEnglish', '$fatherName', '$motherName', '$currentSemester', '$readmissionSemester', '$examRoll', '$mobileNumber', '$courseDetails', '$date', '$photoData', '$signature', '$examType'
+        '$department','$email', '$studentNameBangla', '$studentNameEnglish', '$fatherName', '$motherName', '$currentSemester', '$readmissionSemester', '$examRoll', '$mobileNumber', '$courseDetails', '$date',  '$examType'
     )";
 
     // Execute the statement
@@ -192,7 +194,7 @@ if (isset($_POST['submit'])) {
             <div class="mb-3">
                 <label for="readmissionSemester" class="form-label">৭। পুনঃ ভর্তি হলে, শিক্ষাবর্ষ ও সেমিস্টার লিখুন (যদি প্রযোজ্য হয়):</label>
                 <input type="text" class="form-control" id="readmissionSemester" name="readmissionSemester" 
-                    placeholder="Example: 2019-2020 & 3rd" required>
+                    placeholder="Example: 2019-2020 & 3rd">
                 <div id="error-message" class="text-danger" style="display: none;">দয়া করে সঠিক ফরম্যাটে লিখুন (যেমন: 2019-2020 & 3rd).</div>
             </div>
                 <div class="mb-3">
@@ -248,7 +250,10 @@ if (isset($_POST['submit'])) {
                 <td><input type="text" class="form-control" name="courseDetails[0][courseCode]" required></td>
                 <td><input type="number" class="form-control" name="courseDetails[0][courseCredit]" required></td>
                 <td><input type="text" class="form-control" name="courseDetails[0][courseTitle]" required></td>
-                <td><input type="number" step="0.01" class="form-control" name="courseDetails[0][gpaObtained]" required></td>
+                <td>
+    <input type="number" step="0.01" class="form-control" name="courseDetails[0][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
+</td>
+
                 <td>
                     <select class="form-select" name="courseDetails[0][examType]" required>
                         <option value="" disabled selected>Select Exam Type</option>
@@ -456,7 +461,21 @@ document.getElementById('readmissionSemester').addEventListener('input', functio
             errorMessage.style.display = 'none';
         }
     });
-    
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const gpaInputs = document.querySelectorAll('input[name="courseDetails[0][gpaObtained]"]');
+        gpaInputs.forEach(input => {
+            input.addEventListener('input', (event) => {
+                const value = parseFloat(event.target.value);
+                if (value >= 3.0) {
+                    event.target.value = 2.99; // or you can set it to an empty string ''
+                    alert('GPA must be less than 3.0');
+                }
+            });
+        });
+    });
+
+    // add new row
     document.getElementById('addRowBtn').addEventListener('click', function() {
         const tableBody = document.querySelector('#courseTable tbody');
         const rowCount = tableBody.rows.length;
@@ -483,7 +502,10 @@ document.getElementById('readmissionSemester').addEventListener('input', functio
                 <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseCode]" required></td>
                 <td><input type="number" class="form-control" name="courseDetails[${rowCount}][courseCredit]" required></td>
                 <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseTitle]" required></td>
-                <td><input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required></td>
+                <td>
+    <input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
+</td>
+
                 <td>
                     <select class="form-select" name="courseDetails[${rowCount}][examType]" required>
                         <option value="" disabled selected>Select Exam Type</option>
@@ -526,6 +548,12 @@ document.getElementById('readmissionSemester').addEventListener('input', functio
             document.body.removeChild(tempSpan);
         });
     });
+
+
+    //validate cgpa
+  
+
+
 
     //update session
 

@@ -50,13 +50,14 @@ if (!$res) {
                                         <th>Credit</th>
                                         <th>Course Title</th>
                                         <th>GPA Obtained</th>
-                                       
+                                        <th>Exam Type</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                             ";
-
+                            $counter = 0;
                             while ($row = mysqli_fetch_assoc($res)) {
+                                $counter++;
                                 // Decode JSON data
                                 $course_details = json_decode($row['course_details'], true);
 
@@ -66,15 +67,25 @@ if (!$res) {
                                 }
 
                                 foreach ($course_details as $course) {
-                                    // Check if all fields are present and serial number is not empty
-                                    if (!empty($course['serialNo']) && !empty($course['semester']) && !empty($course['courseNo']) && !empty($course['courseTitle']) && !empty($course['gradeObtained'])) {
-                                        $serial_no = htmlspecialchars($course['serialNo']);
-                                        $year = htmlspecialchars($row['current_semester']); // Assuming 'current_semester' is the year
+                                    // Check if all fields are present
+                                    if (
+                                        !empty($course['serialNo']) &&
+                                        !empty($course['year']) &&
+                                        !empty($course['semester']) &&
+                                        !empty($course['courseCode']) &&
+                                        !empty($course['courseCredit']) &&
+                                        !empty($course['courseTitle']) &&
+                                        !empty($course['gpaObtained']) &&
+                                        !empty($course['examType'])
+                                    ) {
+                                        $serial_no = $counter;
+                                        $year = htmlspecialchars($course['year']);
                                         $semester = htmlspecialchars($course['semester']);
-                                        $course_code = htmlspecialchars($course['courseNo']);
+                                        $course_code = htmlspecialchars($course['courseCode']);
+                                        $credit = htmlspecialchars($course['courseCredit']);
                                         $course_title = htmlspecialchars($course['courseTitle']);
-                                        $gpa = htmlspecialchars($course['gradeObtained']);
-                                       // Assuming you have 'exam_type' in your row
+                                        $gpa = htmlspecialchars($course['gpaObtained']);
+                                        $exam_type = htmlspecialchars($course['examType']);
 
                                         // Output table row
                                         echo "
@@ -83,10 +94,10 @@ if (!$res) {
                                             <td>$year</td>
                                             <td>$semester</td>
                                             <td>$course_code</td>
-                                            <td></td> <!-- Assuming credit is not provided in your JSON -->
+                                            <td>$credit</td>
                                             <td>$course_title</td>
                                             <td>$gpa</td>
-                                            
+                                            <td>$exam_type</td>
                                         </tr>
                                         ";
                                     }

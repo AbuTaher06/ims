@@ -1,99 +1,145 @@
-<?php 
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['admin'])) {
+  header("Location: ../studentlogin.php");
+  ob_end_flush();
+  exit(); 
+}
+?>
+<?php
+
 include("../include/connect.php");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Header Navbar</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K2VvTMvLDAU2sa+9vb7/Z1oRS6x3gUq5J5Fytbx8rPU=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
-    <style>
-        /* Custom CSS for login link */
-.login-link {
-    padding: 8px 16px; /* Adjust padding as needed */
-    border-radius: 4px; /* Rounded corners */
-    transition: background-color 0.3s; /* Smooth hover transition */
-}
-
-.login-link:hover {
-    background-color: rgba(255, 255, 255, 0.1); /* Lighten background color on hover */
-    color: #fff; /* Change text color on hover */
-    text-decoration: none; /* Remove underline on hover */
-}
-
-        .navbar .navbar-brand img {
-            max-height: 50px;
-        }
-        @media (max-width: 576px) {
-            .navbar .navbar-brand img {
-                max-height: 30px;
-            }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title><?php echo isset($pageTitle) ? $pageTitle : 'Default Title'; ?></title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+  <!-- Vendor CSS Files -->
+  <link href="../admin/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../admin/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="../admin/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="../admin/assets/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="../admin/assets/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="../admin/assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="../admin/assets/vendor/simple-datatables/style.css" rel="stylesheet">
+  <!-- Template Main CSS File -->
+  <link href="../admin/assets/css/style.css" rel="stylesheet">
 </head>
 <body>
-<nav class="navbar navbar-expand-md navbar-dark bg-success">
-    <div class="container">
-        <a class="navbar-brand" href="./index.php">
-            <img src="./img/jkkniu.png" alt="Logo">
-        </a>
-        <a href="./index.php"><h5 class="text-white mb-0 mr-10">Course Improvement Management System</h5></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown">
-                    <?php
-                    // Check if user is logged in
-                    if (isset($_SESSION['admin'])) {
-                        $user = $_SESSION['admin'];
-                        // Query to fetch profile picture URL from admin table based on username
-                        $query = "SELECT profile FROM admin WHERE username = '$user'";
-                        $result = mysqli_query($conn, $query);
-                    
-                        // Check if query was successful and if profile picture exists
-                        if ($result && mysqli_num_rows($result) > 0) {
-                            $row = mysqli_fetch_assoc($result);
-                            $profile_picture_url = $row['profile'];
-                        } else {
-                            // Default profile picture URL if not found in database
-                            $profile_picture_url = 'default_profile_picture_url.jpg';
-                        }
-                    
-                        // Output the dropdown menu with profile picture and username
-                        echo '<a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="./img/' . $profile_picture_url . '" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px;">
-                        '.$user.'
-                      </a>';
-                
-                    } else  {
-                        // Default dropdown text if user is not logged in
-                      //  echo '<a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Username</a>';
-                        header("location:../adminLogin.php");
-                      
-                    }
-                    ?> 
-             
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="profile.php">Profile</a></li>
-                        <li><a class="dropdown-item" href="change_password.php">Change Password</a></li>
-                        <li><a class="dropdown-item" href="logout.php">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="index.php" class="logo d-flex align-items-center">
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <span class="d-none d-lg-block">Course Improvement Management System
+        </span>
+      </a>
+      <i class="bi bi-list toggle-sidebar-btn"></i>
     </div>
-</nav>
+    <!-- <div class="search-bar">
+      <form class="search-form d-flex align-items-center" method="POST" action="#">
+        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
+        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+      </form>
+    </div> -->
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+        <li class="nav-item d-block d-lg-none">
+          <a class="nav-link nav-icon search-bar-toggle" href="#"><i class="bi bi-search"></i></a>
+        </li>
+        <li class="nav-item dropdown">
+          <?php
+        $username=$_SESSION['admin'];
+          $query = "SELECT * FROM admin WHERE username = '$username'";
+          $result = mysqli_query($conn, $query);
+          $num = mysqli_num_rows($result);
+          ?>
+          <a class="nav-link nav-icon" href="" data-bs-toggle="dropdown">
+            <i class="bi bi-bell"></i>
+            <span class="badge bg-primary badge-number"><?php echo $num; ?></span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <?php
+            echo '<li class="dropdown-header">You have ' . $num . ' new notifications';
+            echo '<a href="view_reports.php"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a></li>';
+            ?>
+            <li><hr class="dropdown-divider"></li>
+            <!-- <li class="dropdown-footer">
+              <a href="#">Your Complaint is Approved</a>
+            </li> -->
+          </ul>
+        </li>
+      
+        <?php
+       // $email=$_SESSION['student'];
+        $sql="select * from admin where username='$username'";
+        $result=mysqli_query($conn,$sql);
+        $row=mysqli_fetch_assoc($result);
+        ?>
+        <a class="nav-link nav-profile d-flex align-items-center pe-0" href="users-profile.php" data-bs-toggle="dropdown">
+        <img src="../admin/uploads/<?php echo $row['profile']; ?>" alt="Profile" class="rounded-circle">
 
+          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $row['username'];?></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li class="dropdown-header">
+            <h6><?php echo $row['username'];?></h6>
+            
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="users-profile.php">
+              <i class="bi bi-person"></i>
+              <span>My Profile</span>
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="pages-contact.php">
+              <i class="bi bi-question-circle"></i>
+              <span>Need Help?</span>
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="logout.php">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sign Out</span>
+            </a>
+          </li>
+        </ul>
+      </ul>
+    </nav>
+  </header>
+  <!-- End Header -->
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+<!-- Vendor JS Files -->
+<script src="../admin/assets/vendor/apexcharts/apexcharts.min.js"></script>
+<script src="../admin/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="../admin/assets/vendor/chart.js/chart.umd.js"></script>
+<script src="../admin/assets/vendor/echarts/echarts.min.js"></script>
+<script src="../admin/assets/vendor/quill/quill.js"></script>
+<script src="../admin/assets/vendor/simple-datatables/simple-datatables.js"></script>
+<script src="../admin/assets/vendor/tinymce/tinymce.min.js"></script>
+<script src="../admin/assets/vendor/php-email-form/validate.js"></script>
 
-
-
+<!-- Template Main JS File -->
+<script src="../admin/assets/js/main.js"></script>
 
 </body>
+
 </html>
+>

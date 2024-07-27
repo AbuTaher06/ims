@@ -1,87 +1,117 @@
 <?php
-$pageTitle = "Home";
+session_start();
+$pageTitle = "Accepted";
 include("header.php"); // Include header file
 include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
 ?>
 
-    <style>
-        .form-card {
-            max-width: 500px;
-            margin: auto;
-            margin-top: 50px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+<style>
+    .form-card {
+        max-width: 500px;
+        margin: auto;
+        margin-top: 50px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
 <main id="main" class="main">
     <div class="container-fluid">
         <div class="row">
-         
-
             <div class="col-md-10">
                 <div class="container">
                     <?php
-                    $student = $_SESSION['student'];
-                    $q = "SELECT * FROM students WHERE email='$student'";
-                    $res = mysqli_query($conn, $q);
+                    $email = $_SESSION['student'];
+                    $q = "SELECT * FROM students WHERE email=?";
+                    $stmt = mysqli_prepare($conn, $q);
+                    mysqli_stmt_bind_param($stmt, 's', $email);
+                    mysqli_stmt_execute($stmt);
+                    $res = mysqli_stmt_get_result($stmt);
                     $r = mysqli_fetch_array($res);
-                    $student_id = $r['stud_id'];
 
-                    $qq = "SELECT * FROM imp_form WHERE exam_roll='$student_id'";
-                    $rq = mysqli_query($conn, $qq);
-                    $r1 = mysqli_fetch_array($rq);
+                    $qq = "SELECT * FROM imp_form WHERE email=?";
+                    $stmt = mysqli_prepare($conn, $qq);
+                    mysqli_stmt_bind_param($stmt, 's', $email);
+                    mysqli_stmt_execute($stmt);
+                    $rq = mysqli_stmt_get_result($stmt);
                     ?>
                     <div>
-                        <p style="text-align:center;color:#fff;background:purple;margin:0;padding:8px;width:100%"><?php echo "Name: " . $r['name'] . "<br>Student ID: " . $r['stud_id'] . "<br>Session: " . $r['session']; ?></p>
+                        <p style="text-align:center;color:#fff;background:purple;margin:0;padding:8px;width:100%">
+                            <?php echo "Name: " . htmlspecialchars($r['name']) . "<br>Student ID: " . htmlspecialchars($r['stud_id']) . "<br>Session: " . htmlspecialchars($r['session']); ?>
+                        </p>
                     </div>
 
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title text-center" style="color:#fff;background:orange;margin:0 px,50 px,0 px,50 px;padding:8px;">Total Credit Improvement Taken</h5>
+                            <h5 class="card-title text-center" style="color:#fff;background:orange;margin:0;padding:8px;">Total Credit Improvement Taken</h5>
                             <?php
-                            $query = "SELECT * FROM imp_form WHERE exam_roll='$student_id'";
-                            $result = mysqli_query($conn, $query);
+                            $query = "SELECT * FROM imp_form WHERE email=? and status='Approved'";
+                            $stmt = mysqli_prepare($conn, $query);
+                            mysqli_stmt_bind_param($stmt, 's', $email);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+
+                            // Initialize an array to group courses by academic year
+                            $courses_by_year = [];
 
                             if ($result && mysqli_num_rows($result) > 0) {
-                                // Initialize academic year variable
-                                $current_academic_year = null;
-
                                 while ($row = mysqli_fetch_assoc($result)) {
                                     // Parse course details
                                     $course_details = json_decode($row['course_details'], true);
                                     if ($course_details && count($course_details) > 0) {
-                                        // Check if any field within course details is not empty
-                                        $notEmptyDetails = false;
                                         foreach ($course_details as $course) {
-                                            if (!empty($course['serialNo']) || !empty($course['semester']) || !empty($course['courseNo']) || !empty($course['courseTitle']) || !empty($course['gradeObtained'])) {
-                                                $notEmptyDetails = true;
-                                                break;
+                                            if (!empty($course['year'])) {
+                                                // Group by academic year
+                                                $academic_year = htmlspecialchars($course['year']);
+                                                $courses_by_year[$academic_year][] = [
+                                                    'semester' => htmlspecialchars($course['semester']),
+                                                    'courseCode' => htmlspecialchars($course['courseCode']),
+                                                    'courseTitle' => htmlspecialchars($course['courseTitle']),
+                                                    'courseCredit' => htmlspecialchars($course['courseCredit']),
+                                                    'gpaObtained' => htmlspecialchars($course['gpaObtained'])
+                                                ];
                                             }
-                                        }
-
-                                        // Display academic year and course details if not empty
-                                        if ($notEmptyDetails) {
-                                            // Check if the academic year has changed
-                                            $semester = $course_details[0]['semester'];
-                                            $academic_year = ceil($semester / 2);
-                                            if ($academic_year !== $current_academic_year) {
-                                                // Display academic year title
-                                                echo "<p><strong>Academic Year:</strong> " . $academic_year . "</p>";
-                                                $current_academic_year = $academic_year;
-                                            }
-
-                                            // Display course details
-                                            echo "<ul>";
-                                            foreach ($course_details as $course) {
-                                                if (!empty($course['serialNo']) || !empty($course['semester']) || !empty($course['courseNo']) || !empty($course['courseTitle']) || !empty($course['gradeObtained'])) {
-                                                    echo "<li><strong>Semester:</strong> " . $course['semester'] . ", <strong>Course Code:</strong> " . $course['courseNo'] . ", <strong>Course Name:</strong> " . $course['courseTitle'] . " , <strong>Credit Hour:</strong> " . $course['gradeObtained'] . "</li>";
-                                                }
-                                            }
-                                            echo "</ul>";
                                         }
                                     }
+                                }
+
+                                // Display courses grouped by academic year
+                                foreach ($courses_by_year as $academic_year => $courses) {
+                                    echo "<h6><strong>Academic Year:</strong> " . $academic_year . "</h6>";
+                                    echo "<table>";
+                                    echo "<thead><tr>
+                                            <th>Semester</th>
+                                            <th>Course Code</th>
+                                            <th>Course Name</th>
+                                            <th>Credit Hour</th>
+                                            <th>GPA Obtained</th>
+                                        </tr></thead>";
+                                    echo "<tbody>";
+                                    foreach ($courses as $course) {
+                                        echo "<tr>
+                                                <td>" . $course['semester'] . "</td>
+                                                <td>" . $course['courseCode'] . "</td>
+                                                <td>" . $course['courseTitle'] . "</td>
+                                                <td>" . $course['courseCredit'] . "</td>
+                                                <td>" . $course['gpaObtained'] . "</td>
+                                              </tr>";
+                                    }
+                                    echo "</tbody></table>";
                                 }
                             } else {
                                 echo "<p>No data available.</p>";
@@ -93,8 +123,5 @@ include("../include/connect.php");
             </div>
         </div>
     </div>
-    </main>
-    <?php
-    include("footer.php")
-    ?>
-<
+</main>
+<?php include("footer.php"); ?>

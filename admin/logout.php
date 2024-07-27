@@ -2,19 +2,14 @@
 <?php
 session_start();
 
-// Check if the user is logged in
-if (isset($_SESSION['id'])) {
-    // Unset session variables
+// Unset all of the session variables
+$_SESSION = array();
 
-    // Destroy the session
-    session_destroy();
+// Destroy the session.
+session_destroy();
 
-    // Redirect to the login page
-    header("Location: ../adminlogin.php");
-    exit;
-} else {
-    // Redirect to the login page if the user is not logged in
-    header("Location: ../adminlogin.php");
-    exit;
-}
+// Redirect to the login page or any other desired page
+header("Location:../studentlogin.php");
+exit;
 ?>
+
