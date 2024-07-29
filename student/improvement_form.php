@@ -438,122 +438,128 @@ $nextSession = $nextStartingYear . '-' . $nextEndingYear;
 
 <!-- AJAX Script to Submit Form and Generate PDF -->
 <script>
-document.getElementById('readmissionSemester').addEventListener('input', function() {
-        const input = this.value;
-        const pattern = /^\d{4}-\d{4} & \d+(?:[a-zA-Z]+)?$/; // Pattern for "YYYY-YYYY & Xth"
-
-        const errorMessage = document.getElementById('error-message');
-        if (!pattern.test(input)) {
-            errorMessage.style.display = 'block';
-        } else {
-            errorMessage.style.display = 'none';
-        }
-    });
-
-    document.getElementById('mobileNumber').addEventListener('input', function() {
-        const input = this.value;
-        const pattern = /^01[3-9]\d{8}$/; // Pattern for Bangladeshi mobile numbers
-
-        const errorMessage = document.getElementById('phone-error-message');
-        if (!pattern.test(input)) {
-            errorMessage.style.display = 'block';
-        } else {
-            errorMessage.style.display = 'none';
-        }
-    });
-
     document.addEventListener('DOMContentLoaded', (event) => {
-        const gpaInputs = document.querySelectorAll('input[name="courseDetails[0][gpaObtained]"]');
-        gpaInputs.forEach(input => {
-            input.addEventListener('input', (event) => {
-                const value = parseFloat(event.target.value);
-                if (value >= 3.0) {
-                    event.target.value = 2.99; // or you can set it to an empty string ''
-                    alert('GPA must be less than 3.0');
-                }
+        // Function to apply GPA validation to all GPA inputs
+        function applyGPAValidation() {
+            const gpaInputs = document.querySelectorAll('input[name$="[gpaObtained]"]');
+            gpaInputs.forEach(input => {
+                input.addEventListener('input', (event) => {
+                    const value = parseFloat(event.target.value);
+                    if (value >= 3.0) {
+                        event.target.value = 2.99; // or set to ''
+                        alert('GPA must be less than 3.0');
+                    }
+                });
+            });
+        }
+
+        // Apply validation to existing GPA inputs
+        applyGPAValidation();
+
+        // Add new row functionality
+        document.getElementById('addRowBtn').addEventListener('click', function() {
+            const tableBody = document.querySelector('#courseTable tbody');
+            const rowCount = tableBody.rows.length;
+
+            const newRow = `
+                <tr>
+                    <td><input type="number" class="form-control" name="courseDetails[${rowCount}][serialNo]" value="${rowCount + 1}" readonly></td>
+                    <td>
+                        <select class="form-select" name="courseDetails[${rowCount}][year]" required>
+                            <option value="" disabled selected>Select Year</option>
+                            <option value="1">১ম</option>
+                            <option value="2">২য়</option>
+                            <option value="3">৩য়</option>
+                            <option value="4">৪র্থ</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-select" name="courseDetails[${rowCount}][semester]" required>
+                            <option value="" disabled selected>Select Semester</option>
+                            <option value="1">১ম</option>
+                            <option value="2">২য়</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseCode]" required></td>
+                    <td><input type="number" class="form-control" name="courseDetails[${rowCount}][courseCredit]" required></td>
+                    <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseTitle]" required></td>
+                    <td>
+                        <input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
+                    </td>
+                    <td>
+                        <select class="form-select" name="courseDetails[${rowCount}][examType]" required>
+                            <option value="" disabled selected>Select Exam Type</option>
+                            <option value="Improvement">Improvement</option>
+                            <option value="Fail">Fail</option>
+                        </select>
+                    </td>
+                    <td><button type="button" class="btn btn-danger removeRowBtn">Remove</button></td>
+                </tr>
+            `;
+
+            tableBody.insertAdjacentHTML('beforeend', newRow);
+
+            // Reapply validation to newly added GPA input fields
+            applyGPAValidation();
+        });
+
+        // Remove row functionality
+        document.querySelector('#courseTable tbody').addEventListener('click', function(event) {
+            if (event.target.classList.contains('removeRowBtn')) {
+                event.target.closest('tr').remove();
+                updateSerialNumbers();
+            }
+        });
+
+        // Update serial numbers after removing a row
+        function updateSerialNumbers() {
+            const rows = document.querySelectorAll('#courseTable tbody tr');
+            rows.forEach((row, index) => {
+                row.querySelector('input[name*="[serialNo]"]').value = index + 1;
+            });
+        }
+
+        // Expandable input fields
+        document.querySelectorAll('#courseTable input[type="text"], #courseTable input[type="number"]').forEach(input => {
+            input.addEventListener('input', function() {
+                const tempSpan = document.createElement('span');
+                document.body.appendChild(tempSpan);
+                tempSpan.innerText = this.value || this.placeholder;
+                tempSpan.style.fontSize = getComputedStyle(this).fontSize;
+                tempSpan.style.visibility = 'hidden';
+                tempSpan.style.position = 'absolute';
+                const width = tempSpan.offsetWidth + 20; // Add some padding
+                this.style.width = `${width}px`;
+                document.body.removeChild(tempSpan);
             });
         });
-    });
 
-    // add new row
-    document.getElementById('addRowBtn').addEventListener('click', function() {
-        const tableBody = document.querySelector('#courseTable tbody');
-        const rowCount = tableBody.rows.length;
+        // Validate readmission semester
+        document.getElementById('readmissionSemester').addEventListener('input', function() {
+            const input = this.value;
+            const pattern = /^\d{4}-\d{4} & \d+(?:[a-zA-Z]+)?$/; // Pattern for "YYYY-YYYY & Xth"
 
-        const newRow = `
-            <tr>
-                <td><input type="number" class="form-control" name="courseDetails[${rowCount}][serialNo]" value="${rowCount + 1}" readonly></td>
-                <td>
-                    <select class="form-select" name="courseDetails[${rowCount}][year]" required>
-                        <option value="" disabled selected>Select Year</option>
-                        <option value="1">১ম</option>
-                        <option value="2">২য়</option>
-                        <option value="3">৩য়</option>
-                        <option value="4">৪র্থ</option>
-                    </select>
-                </td>
-                <td>
-                    <select class="form-select" name="courseDetails[${rowCount}][semester]" required>
-                        <option value="" disabled selected>Select Semester</option>
-                        <option value="1">১ম</option>
-                        <option value="2">২য়</option>
-                    </select>
-                </td>
-                <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseCode]" required></td>
-                <td><input type="number" class="form-control" name="courseDetails[${rowCount}][courseCredit]" required></td>
-                <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseTitle]" required></td>
-                <td>
-    <input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
-</td>
-
-                <td>
-                    <select class="form-select" name="courseDetails[${rowCount}][examType]" required>
-                        <option value="" disabled selected>Select Exam Type</option>
-                        <option value="Improvement">Improvement</option>
-                        <option value="Fail">Fail</option>
-                    </select>
-                </td>
-                <td><button type="button" class="btn btn-danger removeRowBtn">মুছে ফেলুন</button></td>
-            </tr>
-        `;
-
-        tableBody.insertAdjacentHTML('beforeend', newRow);
-    });
-
-    // Remove row functionality
-    document.querySelector('#courseTable tbody').addEventListener('click', function(event) {
-        if (event.target.classList.contains('removeRowBtn')) {
-            event.target.closest('tr').remove();
-            updateSerialNumbers();
-        }
-    });
-
-    function updateSerialNumbers() {
-        const rows = document.querySelectorAll('#courseTable tbody tr');
-        rows.forEach((row, index) => {
-            row.querySelector('input[name*="[serialNo]"]').value = index + 1;
+            const errorMessage = document.getElementById('error-message');
+            if (!pattern.test(input)) {
+                errorMessage.style.display = 'block';
+            } else {
+                errorMessage.style.display = 'none';
+            }
         });
-    } 
-// expandable only for course table
-    document.querySelectorAll('#courseTable input[type="text"], #courseTable input[type="number"]').forEach(input => {
-        input.addEventListener('input', function() {
-            const tempSpan = document.createElement('span');
-            document.body.appendChild(tempSpan);
-            tempSpan.innerText = this.value || this.placeholder;
-            tempSpan.style.fontSize = getComputedStyle(this).fontSize;
-            tempSpan.style.visibility = 'hidden';
-            tempSpan.style.position = 'absolute';
-            const width = tempSpan.offsetWidth + 20; // Add some padding
-            this.style.width = `${width}px`;
-            document.body.removeChild(tempSpan);
+
+        // Validate mobile number
+        document.getElementById('mobileNumber').addEventListener('input', function() {
+            const input = this.value;
+            const pattern = /^01[3-9]\d{8}$/; // Pattern for Bangladeshi mobile numbers
+
+            const errorMessage = document.getElementById('phone-error-message');
+            if (!pattern.test(input)) {
+                errorMessage.style.display = 'block';
+            } else {
+                errorMessage.style.display = 'none';
+            }
         });
     });
-
-
-    //validate cgpa
-  
-
-
 
     //update session
 
@@ -579,6 +585,7 @@ document.getElementById('readmissionSemester').addEventListener('input', functio
         // Update the content of the paragraph element with the publish date
         publishDateDisplay.textContent = `৪| সংশ্লিষ্ট পরীক্ষার ফলাফল প্রকাশের তারিখ: ${publishDate} / খ্রি:`;
     });
+   
   
 </script>
 </main>
