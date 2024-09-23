@@ -1,15 +1,29 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['dept'])) {
+  header("Location: ../deptlogin.php");
+  ob_end_flush();
+  exit(); 
+}
 
-session_start();
-$dept=$_SESSION['dept'];
+$pageTitle = "Student";
+include("header.php"); 
+include("sidebar.php"); 
 include("../include/connect.php");
+$dept=$_SESSION['dept'];
 
+?>
+<main id="main" class="main"><?php
 $sql="SELECT * FROM improvement_requested WHERE status='Pending' AND department='$dept' ORDER BY data_reg ASC";
 $res=mysqli_query($conn,$sql);
 
 $output="";
 
 $output = "
+
 <table class='table table-bordered'>
     <tr> 
     <th>Name</th>
@@ -62,4 +76,8 @@ $output .= "</table>";
 
 echo $output; // This will send the generated HTML back to the AJAX request
 
+?>
+</main>
+<?php 
+include('footer.php');
 ?>

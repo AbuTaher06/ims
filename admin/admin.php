@@ -1,5 +1,15 @@
 <?php
 session_start();
+ob_start();
+if (!isset($_SESSION['admin'])) {
+    header("Location: ../admin_login.php");
+    ob_end_flush();
+    exit(); 
+}
+
+$pageTitle='Admin Dashboard';
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
 
 // Handling Admin Removal
@@ -10,28 +20,11 @@ if (isset($_POST['admin_id'])) {
     header("Location: ".$_SERVER['PHP_SELF']);
     exit();
 }
-
 ?>
-<!DOCTYPE html>
-<html>
-
-<head>
-    <title></title>
-</head>
-
-<body>
-    <?php
-    include("header.php");
-    ?>
-
+<main id="main" class="main">
     <div class="container-fluid">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-md-2" style="margin-left:-30px;">
-                    <?php
-                    include("sidenav.php");
-                    ?>
-                </div>
                 <div class="col-md-10">
                     <div class="col-md-12">
                         <div class="row">
@@ -56,24 +49,28 @@ if (isset($_POST['admin_id'])) {
                                 if (mysqli_num_rows($result) < 1) {
                                     $output .= "<tr><td colspan='3' class='text-center'>No new Admin</td></tr>";
                                 }
-
+                                $counter = 0;
                                 while ($row = mysqli_fetch_array($result)) {
-                                    $id = $row["id"];
+                                    $id = $row['id'];
+                                    $counter++;
                                     $username = $row['username'];
                                     $output .= "
                                         <tr>
-                                            <td>$id</td>
+                                            <td>$counter</td>
                                             <td>$username</td>
                                             <td>
                                                 <form method='post'>
                                                     <input type='hidden' name='admin_id' value='$id'>
-                                                    <button type='submit' class='btn btn-danger'>Remove</button>
+                                                    <button type='submit' class='btn btn-danger'>
+                                                        <i class='fas fa-trash'></i> 
+                                                    </button>
                                                 </form>
                                             </td>
-                                        ";
+                                        </tr>
+                                    ";
                                 }
 
-                                $output .= " </tr></tbody></table>";
+                                $output .= " </tbody></table>";
                                 echo $output;
                                 ?>
                             </div>
@@ -98,10 +95,8 @@ if (isset($_POST['admin_id'])) {
                                         $sql="INSERT INTO admin(username,password,profile) VALUES('$uname','$pass','$image')";
                                         $result = mysqli_query($conn, $sql);    
                                         if($result) {
-                                            move_uploaded_file($_FILES['img']['tmp_name'],"img/$image");
-                                           
-                              }
-                                        else{
+                                            move_uploaded_file($_FILES['img']['tmp_name'], "uploads/$image");
+                                        } else {
                                             echo "Error adding admin: " . mysqli_error($conn);
                                         }
                                     }
@@ -109,9 +104,8 @@ if (isset($_POST['admin_id'])) {
 
                                 if(isset($error['u'])) {
                                     $er = $error['u'];
-                                    $show="<h5 class='text-center alert alert-danger'>$er</h5></h5>";
-                                }
-                                else{
+                                    $show="<h5 class='text-center alert alert-danger'>$er</h5>";
+                                } else {
                                     $show="";
                                 }
                                 ?>
@@ -141,9 +135,7 @@ if (isset($_POST['admin_id'])) {
             </div>
         </div>
     </div>
-    <?php 
-        include("../footer.php");
-        ?>
-</body>
-
-</html>
+</main>
+<?php 
+include('footer.php');
+?>

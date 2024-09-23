@@ -27,20 +27,19 @@
 <body>
 <?php
 session_start();
-include("../include/header.php");
+$pageTitle = 'Departments';
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
 ?>
+<main id="main" class="main">
 <div class="container-fluid">
     <div class="col-md-12">
         <div class="row">
-            <div class="col-md-2" style="margin-left: -30px;">
-                <?php
-                include("sidenav.php");
-                ?>
-            </div>
+           
             <div class="col-md-10">
                 <h4 class="text-center my-2 text-danger">
-                    Pending Request for Improvement
+                    Pending Request for Registration
                     <i class="fas fa-exclamation-circle"></i> <!-- Pending icon -->
                 </h4>
 
@@ -67,9 +66,7 @@ include("../include/connect.php");
                                     <th>Name</th>
                                     <th>Student ID</th>
                                     <th>Session</th>
-                                    <th>Course Title</th>
-                                    <th>Course Code</th>
-                                    <th>Credit Hour</th>
+                                
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -96,14 +93,12 @@ include("../include/connect.php");
                                     <td>" . $row['name'] . "</td>
                                     <td>" . $row['student_id'] . "</td>
                                     <td>" . $row['session'] . "</td>
-                                    <td>" . $row['course_title'] . "</td>
-                                    <td>" . $row['course_code'] . "</td>
-                                    <td>" . $row['credit_hour'] . "</td>
-                                    <td><button class='btn btn-danger'>" . $row['status'] . "</button></td>
+                                
+                                    <td><span class='badge bg-warning text-dark'>" . $row['status'] . "</td>
                                     <td>
                                 
-                                    <a href='view.php?id=" . $row['id'] . "&name=" . $row['username'] . "'>
-                                        <button class='btn btn-info'>View Profile</button>
+                                    <a href='view.php?id=" . $row['id'] . "&name=" . $row['username'] . "'><i class='fas fa-eye'></i>
+                                        View Profile
                                     </a>
                                 </td>
                                 </tr>
@@ -122,8 +117,7 @@ include("../include/connect.php");
         </div>
     </div>
 </div>
+</main>
 <?php
-include("../footer.php");
+include("footer.php");
 ?>
-</body>
-</html>

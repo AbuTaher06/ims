@@ -1,27 +1,23 @@
-<?php 
+<?php
 session_start();
+ob_start();
+if (!isset($_SESSION['admin'])) {
+    header("Location: ../admin_login.php");
+    ob_end_flush();
+    exit(); 
+}
+
+$pageTitle='Add Department';
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
+include("../include/connect.php");
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add Department</title>
-  <!-- Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .form-group-inputs .form-control {
       margin-bottom: 0.5rem; /* Adjust the margin as needed */
     }
   </style>
-</head>
-<body>
-    <?php 
-    include("../include/connect.php");
-    include("header.php");
-  
-// Assuming your form submits data using POST method
-
+<?php
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form values
@@ -38,11 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
+<main id="main" class="main">
    <div class="container-fluid">
     <div class="row">
-      <div class="col-md-2 p-0">
-        <?php include("sidenav.php"); ?>
-      </div>
+      
       <div class="col-md-2"></div>
       <div class="col-md-6 my-4">
         <div class="card p-4">
@@ -51,18 +46,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <form action="" method="POST" enctype="multipart/form-data">
               <div class="form-group">
                 <label for="name">Department name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+                <input type="text" class="form-control" id="name" name="name" placeholder="ALL LETTER MUST BE CAPITAL" required>
               </div>
               <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter a username"  required>
               </div>
               <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter a password" required>
               </div>
 
-              <button type="submit" class="btn btn-success btn-block">Submit</button>
+              <button type="submit" class="btn btn-success btn-block mt-3">Submit</button>
             </form>
           </div>
         </div>
@@ -70,10 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="col-md-2"></div>
     </div>
   </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+  </main>
+  <?php 
+  include('footer.php');
+  ?>

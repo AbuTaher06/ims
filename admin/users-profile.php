@@ -55,8 +55,7 @@ if (isset($_POST['update_pass'])) {
 
 // Update Profile
 if (isset($_POST['update_profile'])) {
-    $name = $_POST['name'];
-    $phone = $_POST['phone'];
+  
     $new_username = $_POST['username'];
     $profile_picture = $row['profile']; // Keep the current profile picture
 
@@ -100,8 +99,8 @@ if (isset($_POST['update_profile'])) {
     }
 
     // Update the profile in the database
-    $update_stmt = $conn->prepare("UPDATE admin SET name = ?, phone = ?, username = ?, profile = ? WHERE username = ?");
-    $update_stmt->bind_param("sssss", $name, $phone, $new_username, $profile_picture, $username);
+    $update_stmt = $conn->prepare("UPDATE admin SET profile = ? WHERE username = ?");
+    $update_stmt->bind_param("ss",  $profile_picture,$username);
 
     if ($update_stmt->execute()) {
         echo "<script>alert('Profile Updated Successfully');</script>";
@@ -142,7 +141,7 @@ if (isset($_POST['update_profile'])) {
                         </div>
                         
                         <p class="profile-username"><?php echo $_SESSION['admin']; ?></p>
-                        <!-- <p class="profile-phone"><?php echo $row['phone']; ?></p> -->
+                       
                     </div>
                 </div>
             </div>
@@ -161,18 +160,7 @@ if (isset($_POST['update_profile'])) {
                         <div class="tab-content pt-2">
                             <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
                                 <form method="post" enctype="multipart/form-data">
-                                    <div class="row mb-3">
-                                        <label for="name" class="col-md-4 col-lg-3 col-form-label">Name</label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <input name="name" type="text" class="form-control" id="name" value="<?php echo $row['name']; ?>" required>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-3">
-                                        <label for="Phone" class="col-md-4 col-lg-3 col-form-label">Phone</label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <input name="phone" type="text" class="form-control" id="Phone" value="<?php echo $row['phone']; ?>" required>
-                                        </div>
-                                    </div>
+                                    
                                     <div class="row mb-3">
                                         <label for="username" class="col-md-4 col-lg-3 col-form-label">username</label>
                                         <div class="col-md-8 col-lg-9">

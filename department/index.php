@@ -1,193 +1,119 @@
-<?php 
-session_start();
+<?php
+
+
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['dept'])) {
+  header("Location: ../deptlogin.php");
+  ob_end_flush();
+  exit(); 
+}
+
+$pageTitle = "Dashboard";
+include("header.php"); 
+include("sidebar.php"); 
+include("../include/connect.php");
 ?>
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Department Dashboard</title>
-    </head>
 
-    <body>
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Dashboard</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+        <li class="breadcrumb-item active">Dashboard</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <div class="row">
+    <div class="col-lg-4 col-md-6 ">
+      <div class="card text-center bg-info">
+        <div class="card-body">
+          <?php
+          $dept=$_SESSION['dept'];
+            $ad=mysqli_query($conn,"select * from students where department='$dept'");
+            $num=mysqli_num_rows($ad);
+            ?>
+          <h5 class="card-title">Total Student</h5>
+          <p class="card-text"><?php echo $num; ?></p> <!-- Replace with dynamic count -->
+          <a href="student.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 col-md-6">
+      <div class="card text-center  bg-warning">
+        <div class="card-body">
         <?php
-        include("header.php");
-        include("../include/connect.php");
-        ?>
+            $std=mysqli_query($conn,"select * from courses where dept_name='$dept'");
+            $t_c=mysqli_num_rows($std);
+            ?>
+          <h5 class="card-title">Total Course</h5>
+          <p class="card-text"><?php echo $t_c; ?></p> <!-- Replace with dynamic count -->
+          <a href="total_course.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
 
-        <div class="container-fluid">
-            
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-2" style="margin-left:-30px;">
-
-                        <?php
-                            include("sidenav.php");
-                        ?>
-
-                        </div>
-
-                        <div class="col-md-10">
-                            <h4 class="my-2">Department Dashboard</h4>
-                            <?php 
-                            $dept=$_SESSION['dept'];
-                            ?>
-                               
-                            <div class="col-md-12 my-5">
-                                <div class="row">
-                             
-                                <div class="col-md-3 bg-primary mx-2" style="height:130px;">
-                                
-
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                                    <?php
-                                                        $p=mysqli_query($conn,"SELECT * FROM students WHERE department='$dept'");
-                                                        $pp=mysqli_num_rows($p);
-                                                    ?>
-                                                <h5 class="my-2 text-white text-center" style="font-size:30px;"><?php echo $pp ;?></h5>
-                                                <h5 class="text-white ">Total</h5>
-                                                <h5 class="text-white ">Student</h5>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                        <a href="student.php"><i class="fa fa-graduation-cap fa-2x my-4" style="color: white;"></i></a>
-
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>                  
-
-                                <div class="col-md-3 bg-info mx-2" style="height:130px;">
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-8">
-
-                                        <?php
-                                            $job=mysqli_query($conn,"SELECT * FROM students WHERE status='Active' AND department='$dept'");
-                                            $num1=mysqli_num_rows($job);
-                                        ?>
-
-                                                <h5 class="my-2 text-white text-center" style="font-size:30px;"><?php echo $num1 ?></h5>
-                                                <h5 class="text-white ">Improvement</h5>
-                                                <h5 class="text-white ">Request</h5>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                           <a href="imp.php"><i class="fa-solid fa-file-pen fa-2x my-4" style="color: white;"></i></a> 
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="card text-center bg-warning">
+        <div class="card-body">
+        <?php
+            $std=mysqli_query($conn,"select * from students where status='Pending'");
+            $t_s=mysqli_num_rows($std);
+            ?>
+          <h5 class="card-title">Improvement Accepted</h5>
+          <p class="card-text"><?php echo $t_s; ?></p> <!-- Replace with dynamic count -->
+          <a href="accepted_request.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div><!-- End Dashboard Cards Row -->
+  <div class="row">
+    <div class="col-lg-4 col-md-6 ">
+      <div class="card text-center bg-primary">
+        <div class="card-body">
+          <h5 class="card-title">Registration Request</h5>
+          <p class="card-text">10</p> <!-- Replace with dynamic count -->
+          <a href="student_request.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
 
 
+    <div class="col-lg-4 col-md-6">
+      <div class="card text-center  bg-success">
+        <div class="card-body">
+        <?php
+            $dept=mysqli_query($conn,"select * from department");
+            $T_d=mysqli_num_rows($dept);
+            ?>
+          <h5 class="card-title">Improvement Request</h5>
+          <p class="card-text"><?php echo $T_d; ?></p> <!-- Replace with dynamic count -->
+          <a href="pending_request.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
 
-                                <div class="col-md-3 bg-success mx-2" style="height:130px;">
+    <div class="col-lg-4 col-md-6">
+      <div class="card text-center bg-danger">
+        <div class="card-body">
+          <h5 class="card-title">Total Pending xxxxxxt</h5>
+          <p class="card-text">3</p> <!-- Replace with dynamic count -->
+          <a href="pending_request.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div><!-- End Dashboard Cards Row -->
 
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                       
-                                                <h5 class="my-2 text-white text-center" style="font-size:30px;"></h5>
-                                                <h5 class="text-white ">Add</h5>
-                                                <h5 class="text-white ">Result</h5>
-                                        </div>
+</main><!-- End #main -->
 
-                                        <div class="col-md-4">
-                                            <a href="add_student.php"><i class="fas fa-user-plus fa-2x my-4" style="color: white;"></i></a>
-                                        </div>
+<?php 
 
-                                    </div>
-                                    </div>
-
-
-                              
-
-
-                    
-                                </div>
-                                <div class="col-md-3 bg-warning mx-2 my-2" style="height:130px;">
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-8">
-
-                                        <?php
-                                            $job=mysqli_query($conn,"SELECT * FROM students WHERE status='Pending' AND department='$dept'");
-                                            $num1=mysqli_num_rows($job);
-                                        ?>
-
-                                                <h5 class="my-2 text-white text-center" style="font-size:30px;"><?php echo $num1 ?></h5>
-                                                <h5 class="text-white ">Registration </h5>
-                                                <h5 class="text-white ">Request</h5>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                           <a href="student_request.php"><i class="fa-solid fa-file-pen fa-2x my-4" style="color: white;"></i></a> 
-                                        </div>
-                                    </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 bg-danger mx-2 my-2" style="height:130px;">
-
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <?php
-                                                $query="SELECT* FROM improvement_requested where status='Approved' AND department='$dept'";
-                                                $res=mysqli_query($conn,$query);
-                                                $ta=mysqli_num_rows($res);
-                                            ?>
-                                                <h5 class="my-2 text-white text-center" style="font-size:30px;"><?php echo $ta;?></h5>
-                                                <h5 class="text-white ">Improvement</h5>
-                                                <h5 class="text-white ">Accepted</h5>
-                                        </div>
-
-                                        <div class="col-md-4">
-                                           <a href="accepted_request.php"><i class="fa-solid fa-check-circle fa-2x my-4" style="color: white;"></i></a> 
-                                        </div>
-                                    </div>
-                                    </div> 
-                                </div>
-
-
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                </div>
-                           
-      <?php
-             include("../footer.php");
-      ?>
-
-
-<script>
-        $(document).ready(function() {
-            // Function to check logout status
-            function checkLogoutStatus() {
-                $.ajax({
-                    url: 'check_logout.php', // Path to the server-side script to check logout status
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.logout) {
-                            // If logout status is true, redirect to login page
-                            window.location.href = '../adminLogin.php';
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                    }
-                });
-            }
-
-            // Call the function initially
-            checkLogoutStatus();
-
-            // Periodically check for logout status every 30 seconds
-            setInterval(checkLogoutStatus, 30000); // 30 seconds
-        });
-    </script>
-    </body>
-</html>
+use deptlogin;
+include("footer.php"); // Include footer file 
+?>

@@ -1,120 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>All Department</title>
-    <!-- Include Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Include Bootstrap for styling -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Define the awesome header color */
-        .awesome-header {
-            background-color: #4CAF50; /* Green color */
-            color: white; /* White text */
-        }
-
-        /* Style even rows */
-        .even-row {
-            background-color: #f2f2f2; /* Light gray */
-        }
-
-        /* Style odd rows */
-        .odd-row {
-            background-color: #dddddd; /* Dark gray */
-        }
-    </style>
-</head>
-<body>
 <?php
 session_start();
-include("header.php");
+ob_start();
+if (!isset($_SESSION['admin'])) {
+    header("Location: ../admin_login.php");
+    ob_end_flush();
+    exit(); 
+}
+
+$pageTitle = 'Departments';
+include("header.php"); // Include header file
+include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
 ?>
-<div class="container-fluid">
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-md-2 " style="margin-left: -30px;">
-                <?php
-                include("sidenav.php");
-                ?>
-            </div>
-            <div class="col-md-2"></div>
-            <div class="col-md-6">
-            <h4 class="text-center my-3 text-success">
-        All Department
-    <i class="fas fa-check-circle"></i> <!-- Accepted icon -->
-</h4>
+<style>
+    .awesome-header {
+        background-color: #007bff; /* Bootstrap primary color */
+        color: white; /* White text */
+    }
+    .even-row {
+        background-color: #f2f2f2; /* Light gray */
+    }
+    .odd-row {
+        background-color: white; /* White */
+    }
+</style>
 
+<main id="main" class="main">
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-8">
+                    <h4 class="text-center my-3 text-primary">
+                        All Departments
+                        <i class="fas fa-check-circle"></i>
+                    </h4>
 
-                <div class="card bg-warning">
-                    <div class="card-body">
-                        <?php
+                    <div class="card">
+                        <div class="card-body">
+                            <?php
+                            $sql = "SELECT * FROM department";
+                            $res = mysqli_query($conn, $sql);
 
-                        $sql = "SELECT * FROM department";
-                        $res = mysqli_query($conn, $sql);
-                      
-                        
-                        
-              
-
-                        $output = "
-                        
-                        <table class='table table-bordered'>
-                            <thead class='awesome-header'> <!-- Apply awesome header color here -->
-                                <tr>   
-                                    <th class='text-center'>Department Name</th>
-                                    <th class='text-center'>Total Students</th>
-
-                                   
-                                </tr>
-                            </thead>
-                            <tbody>
-                        ";
-
-                        if (mysqli_num_rows($res) == 0) { // Check if there are no rows
-                            $output .= "
-                            <tr>
-                                <td colspan='2' class='text-center'>No Department is Found</td>
-                            </tr>
+                            $output = "
+                            <table class='table table-hover'>
+                                <thead class='awesome-header'>
+                                    <tr>   
+                                        <th class='text-center'>Department Name</th>
+                                        <th class='text-center'>Username</th>
+                                        <th class='text-center'>Total Students</th>
+                                        <th class='text-center'>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                             ";
-                        } else {
-                            $row_count = 0;
-                            while ($row = mysqli_fetch_array($res)) {
-                                // Debugging statement to check each row of data
-                              $dept=$row['dept_name'];
-                              $sql1 = "SELECT * FROM students WHERE department='$dept'";
-                                $res1 = mysqli_query($conn, $sql1); 
-                                $tt=mysqli_num_rows($res1);
-                                // Determine row class based on row count
-                                $row_class = ($row_count % 2 == 0) ? 'even-row' : 'odd-row';
-                                $output .= "
-                                <tr class='$row_class'>
-                                    <td><h4>" . $row['dept_name'] . "</h4></td>
-                                  
-                                   
-                                    <td><h4>$tt</h3></td>
-                                    
 
-                               
+                            if (mysqli_num_rows($res) == 0) {
+                                $output .= "
+                                <tr>
+                                    <td colspan='4' class='text-center'>No Department Found</td>
                                 </tr>
                                 ";
-                                $row_count++;
+                            } else {
+                                $row_count = 0;
+                                while ($row = mysqli_fetch_array($res)) {
+                                    $dept = $row['dept_name'];
+                                    $username = $row['username'];
+                                    $sql1 = "SELECT * FROM students WHERE department='$dept'";
+                                    $res1 = mysqli_query($conn, $sql1); 
+                                    $tt = mysqli_num_rows($res1);
+                                    $row_class = ($row_count % 2 == 0) ? 'even-row' : 'odd-row';
+                                    $output .= "
+                                    <tr class='$row_class'>
+                                        <td class='text-center'><strong>" . htmlspecialchars($row['dept_name']) . "</strong></td>
+                                        <td class='text-center'><strong>" . htmlspecialchars($username) . "</strong></td>
+                                        <td class='text-center'><strong>$tt</strong></td>
+                                        <td class='text-center'>
+                                            <a href='edit_department.php?dept_name=" . urlencode($dept) . "' class='btn btn-warning btn-sm'>
+                                                <i class='fas fa-edit'></i> Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    ";
+                                    $row_count++;
+                                }
                             }
-                        }
 
-                        $output .= "</tbody></table>";
+                            $output .= "</tbody></table>";
 
-                        echo $output;
-                        ?>
+                            echo $output;
+                            ?>
+                        </div>
                     </div>
                 </div>
+                <div class="col-md-2"></div>
             </div>
-            <div class="col-md-2"></div>
         </div>
     </div>
-</div>
+</main>
 <?php
-include("../footer.php");
+include("footer.php"); // Include footer file
 ?>
-</body>
-</html>

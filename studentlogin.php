@@ -20,34 +20,32 @@ if (isset($_POST['login'])) {
         $sql = "SELECT * FROM students WHERE email='$email' AND password='$password' AND status='Approved'";
         $result = mysqli_query($conn, $sql);
         
-        if (mysqli_num_rows($result)) {
+        if (mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_array($result);
             $e = $row['email']; // Get the email from the result
             
             // Store the email in the session
             $_SESSION['student'] = $e;
-            $email = $student['email'];
+            $_SESSION['flash_message'] = "Logged in successfully"; // Flash message
 
-            echo "<script>alert('Logged in successfully')</script>";
-            header("Location:student/index.php");
+            header("Location: student/index.php");
             exit(); // Use exit after header redirection
         } else {
-            echo "<script>alert('Invalid Account or You are not verified')</script>";
+            $_SESSION['flash_message'] = "Invalid Account or You are not verified"; // Flash message
         }
+    } else {
+        $_SESSION['flash_message'] = $error['login']; // Flash message
     }
 }
-
-if (isset($error['login'])) {
-    $l = $error['login'];
-    $show = "<h5 class='text-center alert alert-danger'>$l</h5>";
-} else {
-    $show = "";
-}
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Student Login page</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body style="background-image:url(images/student.jpeg); background-repeat:no-repeat;">
 <?php include("include/header.php"); ?>
@@ -57,7 +55,18 @@ if (isset($error['login'])) {
             <div class="col-md-3"></div>
             <div class="col-md-6 my-5 jumbotron">
                 <h5 class="text-center my-3">Login to your account</h5>
-                <?php echo $show; ?>
+                <?php
+                if (isset($_SESSION['flash_message'])) {
+                    echo "
+                    <div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                        " . $_SESSION['flash_message'] . "
+                        <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                            <span aria-hidden='true'>&times;</span>
+                        </button>
+                    </div>";
+                    unset($_SESSION['flash_message']); // Unset the message after displaying it
+                }
+                ?>
                 <div class="card">
                     <div class="card-body">
                         <form method="post">

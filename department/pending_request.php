@@ -1,14 +1,22 @@
-<php 
-session_start();
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['dept'])) {
+  header("Location: ../deptlogin.php");
+  ob_end_flush();
+  exit(); 
+}
+
+$pageTitle = "Student";
+include("header.php"); 
+include("sidebar.php"); 
+include("../include/connect.php");
+$dept=$_SESSION['dept'];
+
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Pending Request</title>
-    <!-- Include Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Include Bootstrap for styling -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
     <style>
         /* Define the awesome header color */
         .awesome-header {
@@ -27,40 +35,27 @@ session_start();
         }
     </style>
 </head>
-<body>
-<?php
-$dept=$_SESSION['dept'];
-include("header.php");
-include("../include/connect.php");
-?>
+<main id="main" class="main">
+
 <div class="container-fluid">
     <div class="col-md-12">
         <div class="row">
-            <div class="col-md-2" style="margin-left: -30px;">
-                <?php
-                include("sidenav.php");
-                ?>
-            </div>
+          
             <div class="col-md-10">
                 <h4 class="text-center my-2 text-danger">
-                    Pending Request for Improvement
+                    Pending Request for Registration
                     <i class="fas fa-exclamation-circle"></i> <!-- Pending icon -->
                 </h4>
 
                 <div class="card">
                     <div class="card-body">
                         <?php
-                        $sql = "SELECT * FROM improvement_requested where status='Pending' AND department='$dept'";
+                        $sql = "SELECT * FROM imp_form where status='Pending' AND department='$dept'";
                         $res = mysqli_query($conn, $sql);
+                     $row = mysqli_fetch_array($res);
 
                         
-                if (isset($_GET['student_id'])) {
-                    $id = $_GET['student_id'];
-                    $query1 = "SELECT * FROM students WHERE id='$id'";
-                    $res1 = mysqli_query($conn, $query1);
-                    $row1 = mysqli_fetch_array($res1);
-                }
-                
+              
 
                         $output = "
                         
@@ -90,7 +85,7 @@ include("../include/connect.php");
                             $row_count = 0;
                             while ($row = mysqli_fetch_array($res)) {
                                 // Debugging statement to check each row of data
-                              
+                              $row_count++;
 
                                 // Determine row class based on row count
                                 $row_class = ($row_count % 2 == 0) ? 'even-row' : 'odd-row';
@@ -125,8 +120,7 @@ include("../include/connect.php");
         </div>
     </div>
 </div>
+</main>
 <?php
-include("../footer.php");
+include("footer.php");
 ?>
-</body>
-</html>

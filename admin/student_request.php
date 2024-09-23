@@ -4,7 +4,7 @@ session_start();
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Request for Improvement</title>
+        <title>Request for Registration</title>
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     </head>

@@ -1,14 +1,20 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['dept'])) {
+  header("Location: ../deptlogin.php");
+  ob_end_flush();
+  exit(); 
+}
+
+$pageTitle = "Student";
+include("header.php"); 
+include("sidebar.php"); 
+include("../include/connect.php");
+$dept=$_SESSION['dept'];
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Accepted Students</title>
-    <!-- Include Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Include Bootstrap for styling -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         /* Define the awesome header color */
         .awesome-header {
@@ -26,21 +32,12 @@ session_start();
             background-color: #dddddd; /* Dark gray */
         }
     </style>
-</head>
-<body>
-<?php
-$dept=$_SESSION['dept'];
-include("header.php");
-include("../include/connect.php");
-?>
+
+<main id="main" class="main">
 <div class="container-fluid">
     <div class="col-md-12">
         <div class="row">
-            <div class="col-md-2 " style="margin-left: -30px;">
-                <?php
-                include("sidenav.php");
-                ?>
-            </div>
+           
             <div class="col-md-10">
             <h4 class="text-center my-3 text-success">
     Request Accepted
@@ -113,8 +110,8 @@ include("../include/connect.php");
         </div>
     </div>
 </div>
+</main>
 <?php
-include("../footer.php");
+include("footer.php");
 ?>
-</body>
-</html>
+

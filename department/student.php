@@ -1,19 +1,19 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['dept'])) {
+  header("Location: ../deptlogin.php");
+  ob_end_flush();
+  exit(); 
+}
+
+$pageTitle = "Student";
+include("header.php"); 
+include("sidebar.php"); 
+include("../include/connect.php");
 ?>
-<!DOCTYPE html>
-<html>
-
-<head>
-  
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <!-- Your HTML file -->
-
-    <title>Total student</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/style.css"> <!-- Add this line to link your custom CSS file -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <!-- ... other head elements ... -->
     <style>
     .custom-table-header {
@@ -31,31 +31,17 @@ session_start();
 
 
     </style>
-</head>
-
-<body style="background-image:url(images/hah.jpg); background-repeat:no-repeat;">
-    <?php
-      
-      $dept=$_SESSION['dept'];
-   
-    include("header.php");
-    include("../include/connect.php")
-    ?>
-
+<main id="main" class="main">
     <div class="container-fluid">
         <div class="col-md-12">
             <div class="row">
-                <div class="col-md-2" style="margin-left:-30px;">
-                    <?php
-                    include("sidenav.php");
-                    ?>
-                </div>
+              
                 <div class="col-md-10">
                     <h4 class="text-center my-3 text-primary">Total Student</h4>
 
                     <?php
                  
-            
+                 $dept=$_SESSION['dept'];
               
                     // Fetch distinct sessions from the database
                     $session_query = "SELECT DISTINCT session FROM students WHERE department='$dept'";
@@ -64,9 +50,7 @@ session_start();
                     ?>
 
                     <!-- Dropdown to filter students by session -->
-                    <div class="card">
-                        <div class="card-body">
-                    
+                
                     <form method="post" style="margin-bottom: 20px;">
                         <label for="session"><h3>Select session:</h3></label>
                         <select name="session" id="session" class="form-control" onchange="this.form.submit()">
@@ -95,7 +79,7 @@ session_start();
                     $output = "
                         <table class='table table-striped' id='studentTable'>
                             <thead class='custom-table-header'>
-                                <tr>
+                                <tr class=' bg bg-secondary'>
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Username</th>
@@ -104,8 +88,8 @@ session_start();
                                     <th>Phone</th>
                                     
                                     <th>Session</th>
-                                    <th>Add Result</th>
-                                    <th>View Result</th>
+                                   <!-- <th>Add Result</th>
+                                   <th>View Result</th> --!>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -131,6 +115,7 @@ session_start();
                                 <td>" . $row['phone'] . "</td>
                                 
                                 <td>" . $row['session'] . "</td>
+                                <!--
                                 <td>
                                     <a href='add_result.php?id=" . $row['id'] . "&name=" . $row['username'] . "'>
                                         <button class='btn btn-primary'>Add Result</button>
@@ -141,6 +126,7 @@ session_start();
                                         <button class='btn btn-success'>View Result</button>
                                     </a>
                                 </td>
+                                --!>
                                 <td>
                                     <a href='view.php?id=" . $row['id'] . "&name=" . $row['username'] . "'>
                                         <button class='btn btn-info'>View Profile</button>
@@ -156,15 +142,13 @@ session_start();
 
                     echo $output;
                     ?>
-                </div>
-            </div>
+              
                 </div>
             </div>
         </div>
     </div>
+</main>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
             $('#studentTable').DataTable();
@@ -173,6 +157,4 @@ session_start();
      <?php 
         include("../footer.php");
         ?>
-</body>
 
-</html>

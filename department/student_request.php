@@ -1,8 +1,20 @@
 <?php
-session_start();
-$dept=$_SESSION['dept'];
+if (session_status() == PHP_SESSION_NONE) {
+  session_start();
+}
+ob_start();
+if (!isset($_SESSION['dept'])) {
+  header("Location: ../deptlogin.php");
+  ob_end_flush();
+  exit(); 
+}
+
+$pageTitle = "Request";
+include("header.php"); 
+include("sidebar.php"); 
 include("../include/connect.php");
 
+$dept=$_SESSION['dept'];
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['id']) && isset($_POST['action'])) {
         $studentId = $_POST['id'];
@@ -34,19 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit; // Terminate the script after handling the AJAX request
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Requests</title>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <!-- Font Awesome CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-</head>
-<body>
-
+<main id="main" class="main">
   <h2 class="mb-0 text-center bg-info">
     <i class="fas fa-exclamation-circle"></i> Pending Student Request
   </h2>
@@ -57,7 +57,7 @@ $res = mysqli_query($conn, $sql);
 $output = "
 <table class='table table-bordered'>
     <tr> 
-        <th>ID</th>
+        <th>Serial No</th>
         <th>Name</th>
         <th>Username</th>
         <th>Stud_ID</th>
@@ -76,10 +76,13 @@ if (mysqli_num_rows($res) == 0) { // Check if there are no rows
         </tr>
     ";
 } else {
+    $i = 0;
     while ($row = mysqli_fetch_array($res)) {
+        $i++; 
+
         $output .= "
             <tr>
-                <td>".$row['id']."</td>
+                <td>".$i."</td>
                 <td>".$row['name']."</td>
                 <td>".$row['username']."</td>
                 <td>".$row['stud_id']."</td>
@@ -108,7 +111,7 @@ $output .= "</table>";
 
 echo $output; // This will send the generated HTML back to the AJAX request
 ?>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</main>
 <script>
 $(document).ready(function() {
   // Approve button click event
@@ -148,3 +151,7 @@ $(document).ready(function() {
   });
 });
 </script>
+
+<?php 
+include('footer.php');
+?>
