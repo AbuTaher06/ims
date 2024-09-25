@@ -12,7 +12,7 @@
             include("include/header.php");
             include("include/connect.php")
         ?>
-    <img src="./images/library.jpg" width="100%" style="height:880px;border-bottom:3px solid white;">
+    <img src="./asset/images/library.jpg" alt="cover" width="100%" style="height:880px;border-bottom:3px solid white;">
     <div class="container-fluid">
         <div class="col-md-12">
             

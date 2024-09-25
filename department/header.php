@@ -37,6 +37,10 @@ include("../include/connect.php");
   <link href="../admin/assets/vendor/simple-datatables/style.css" rel="stylesheet">
   <!-- Template Main CSS File -->
   <link href="../admin/assets/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  
 </head>
 <body>
   <!-- ======= Header ======= -->
@@ -127,6 +131,8 @@ include("../include/connect.php");
   <!-- End Header -->
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 <!-- Vendor JS Files -->
+
+
 <script src="../admin/assets/vendor/apexcharts/apexcharts.min.js"></script>
 <script src="../admin/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="../admin/assets/vendor/chart.js/chart.umd.js"></script>
@@ -138,6 +144,7 @@ include("../include/connect.php");
 
 <!-- Template Main JS File -->
 <script src="../admin/assets/js/main.js"></script>
+
 
 </body>
 

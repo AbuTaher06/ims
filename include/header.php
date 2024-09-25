@@ -37,7 +37,7 @@
 <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <div class="container">
         <a class="navbar-brand" href="./index.php">
-            <img src="./images/jkkniu.png" alt="Logo">
+            <img src="./asset/images/jkkniu.png" alt="Logo">
         </a>
         <a href="./index.php"><h5 class="text-white mb-0 mr-10">Course Improvement Management System</h5></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

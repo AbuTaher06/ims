@@ -93,7 +93,7 @@ $dept=$_SESSION['dept'];
                                         <button class='btn btn-success'>Add for improvement</button>
                                     </a>   --!>
                                       
-                                    <a href='imp_info.php?id=<?php echo $row['id']; ?>&name=<?php echo $row['username']; ?>'>
+                                    <a href='accepted_request.php?id=<?php echo $row['id']; ?>&name=<?php echo $row['username']; ?>'>
                                         <button class='btn btn-primary'>Check Previous Improvement</button>
                                     </a>
                                     

@@ -53,6 +53,7 @@ include("../include/connect.php");
 <?php
 include("../include/connect.php");
 $uname=$_SESSION['student'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_SESSION["student"];
     
@@ -238,56 +239,100 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <label for="courseDetails" class="form-label">১০। যে সকল কোর্সে ফলোন্নয়ন/এফ গ্রেড থেকে উন্নয়ন পরীক্ষায় অংশগ্রহণ করতে ইচ্ছুক তার বিবরণ:</label>
-        <table class="table table-bordered" id="courseTable">
-            <thead>
-                <tr class="bg-primary text-white">
-                    <th scope="col">ক্রমিক নং</th>
-                    <th scope="col">বর্ষ</th>
-                    <th scope="col">সেমিস্টার</th>
-                    <th scope="col">কোর্স কোড</th>
-                    <th scope="col">কোর্স ক্রেডিট</th>
-                    <th scope="col">কোর্স শিরোনাম</th>
-                    <th scope="col">প্রাপ্ত জিপিএ</th>
-                    <th scope="col">পরীক্ষার ধরণ</th>
-                    <th scope="col"><button type="button" class="btn btn-success" id="addRowBtn">Add New Row</button></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input type="number" class="form-control" name="courseDetails[0][serialNo]" value="1" readonly></td>
-                    <td>
-                        <select class="form-select" name="courseDetails[0][year]" required>
-                            <option value="" disabled selected>Select Year</option>
-                            <option value="1">1st</option>
-                            <option value="2">2nd</option>
-                            <option value="3">3rd</option>
-                            <option value="4">4th</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select class="form-select" name="courseDetails[0][semester]" required>
-                            <option value="" disabled selected>Select Semester</option>
-                            <option value="1">1st</option>
-                            <option value="2">2nd</option>
-                        </select>
-                    </td>
-                    <td><input type="text" class="form-control" name="courseDetails[0][courseCode]" required></td>
-                    <td><input type="number" class="form-control" name="courseDetails[0][courseCredit]" required></td>
-                    <td><input type="text" class="form-control" name="courseDetails[0][courseTitle]" required></td>
-                    <td>
-                        <input type="number" step="0.01" class="form-control" name="courseDetails[0][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
-                    </td>
-                    <td>
-                        <select class="form-select" name="courseDetails[0][examType]" required>
-                            <option value="" disabled selected>Select Exam Type</option>
-                            <option value="Improvement">Improvement</option>
-                            <option value="Fail">Fail</option>
-                        </select>
-                    </td>
-                    <td><button type="button" class="btn btn-danger removeRowBtn">Remove</button></td>
-                </tr>
-            </tbody>
-        </table>
+      
+    <table class="table table-bordered" id="courseTable">
+    <thead>
+        <tr class="bg-primary text-white">
+            <th scope="col">ক্রমিক নং</th>
+            <th scope="col">বর্ষ</th>
+            <th scope="col">সেমিস্টার</th>
+            <th scope="col">কোর্স কোড</th>
+            <th scope="col">কোর্স ক্রেডিট</th>
+            <th scope="col">কোর্স শিরোনাম</th>
+            <th scope="col">প্রাপ্ত জিপিএ</th>
+            <th scope="col">পরীক্ষার ধরণ</th>
+            <th scope="col"><button type="button" class="btn btn-success" id="addRowBtn">Add New Row</button></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input type="number" class="form-control" name="courseDetails[0][serialNo]" value="1" readonly></td>
+            <td>
+                <select class="form-select" name="courseDetails[0][year]" required>
+                    <option value="" disabled selected>Select Year</option>
+                    <option value="1">১ম</option>
+                    <option value="2">২য়</option>
+                    <option value="3">৩য়</option>
+                    <option value="4">৪র্থ</option>
+                </select>
+            </td>
+            <td>
+                <select class="form-select" name="courseDetails[0][semester]" required>
+                    <option value="" disabled selected>Select Semester</option>
+                    <option value="1">১ম</option>
+                    <option value="2">২য়</option>
+                </select>
+            </td>
+
+            <!-- Populate dropdowns with initial values from PHP -->
+            <td>
+                <select class="form-select" name="courseDetails[0][courseCode]" required id="courseCodeSelect">
+                    <option value="" disabled selected>Select Course Code</option>
+                    <?php 
+                    $student_info = "SELECT * FROM students WHERE email='$uname'";
+                    $result_info = mysqli_query($conn, $student_info);
+                    $student_row = mysqli_fetch_assoc($result_info);
+                    $dept = $student_row['department'];
+
+                    $course_info = "SELECT * FROM courses WHERE dept_name='$dept'";
+                    $result = mysqli_query($conn, $course_info);
+
+                    while ($course_row = mysqli_fetch_assoc($result)) {
+                        $course_code = $course_row['course_code'];
+                        echo '<option value="' . $course_code . '">' . $course_code . '</option>';
+                    }
+                    ?>
+                </select>
+            </td>
+            <td>
+                <select class="form-select" name="courseDetails[0][courseCredit]" required id="courseCreditSelect">
+                    <option value="" disabled selected>Select Course Credit</option>
+                    <?php 
+                    mysqli_data_seek($result, 0); // Reset pointer for re-use
+                    while ($course_row = mysqli_fetch_assoc($result)) {
+                        $course_credit = $course_row['course_credit'];
+                        echo '<option value="' . $course_credit . '">' . $course_credit . '</option>';
+                    }
+                    ?>
+                </select>
+            </td>
+            <td>
+                <select class="form-select" name="courseDetails[0][courseTitle]" required id="courseTitleSelect">
+                    <option value="" disabled selected>Select Course Title</option>
+                    <?php 
+                    mysqli_data_seek($result, 0); // Reset pointer for re-use
+                    while ($course_row = mysqli_fetch_assoc($result)) {
+                        $course_title = $course_row['course_title'];
+                        echo '<option value="' . $course_title . '">' . $course_title . '</option>';
+                    }
+                    ?>
+                </select>
+            </td>
+
+            <td><input type="number" step="0.01" class="form-control" name="courseDetails[0][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)"></td>
+            <td>
+                <select class="form-select" name="courseDetails[0][examType]" required>
+                    <option value="" disabled selected>Select Exam Type</option>
+                    <option value="Improvement">Improvement</option>
+                    <option value="Fail">Fail</option>
+                </select>
+            </td>
+            <td><button type="button" class="btn btn-danger removeRowBtn">Remove</button></td>
+        </tr>
+    </tbody>
+</table>
+</table>
+
 
         <!-- <div id="error-message" class="text-danger" style="display: none;"></div>  
         <input type="hidden" id="selectedYear" name="selectedYear">
@@ -333,83 +378,138 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Apply validation to existing GPA inputs
         applyGPAValidation();
 
-        // Add new row functionality
-        document.getElementById('addRowBtn').addEventListener('click', function() {
-            const tableBody = document.querySelector('#courseTable tbody');
-            const rowCount = tableBody.rows.length;
-
-            const newRow = `
-                <tr>
-                    <td><input type="number" class="form-control" name="courseDetails[${rowCount}][serialNo]" value="${rowCount + 1}" readonly></td>
-                    <td>
-                        <select class="form-select" name="courseDetails[${rowCount}][year]" required>
-                            <option value="" disabled selected>Select Year</option>
-                            <option value="1">১ম</option>
-                            <option value="2">২য়</option>
-                            <option value="3">৩য়</option>
-                            <option value="4">৪র্থ</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select class="form-select" name="courseDetails[${rowCount}][semester]" required>
-                            <option value="" disabled selected>Select Semester</option>
-                            <option value="1">১ম</option>
-                            <option value="2">২য়</option>
-                        </select>
-                    </td>
-                    <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseCode]" required></td>
-                    <td><input type="number" class="form-control" name="courseDetails[${rowCount}][courseCredit]" required></td>
-                    <td><input type="text" class="form-control" name="courseDetails[${rowCount}][courseTitle]" required></td>
-                    <td>
-                        <input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
-                    </td>
-                    <td>
-                        <select class="form-select" name="courseDetails[${rowCount}][examType]" required>
-                            <option value="" disabled selected>Select Exam Type</option>
-                            <option value="Improvement">Improvement</option>
-                            <option value="Fail">Fail</option>
-                        </select>
-                    </td>
-                    <td><button type="button" class="btn btn-danger removeRowBtn">Remove</button></td>
-                </tr>
-            `;
-
-            tableBody.insertAdjacentHTML('beforeend', newRow);
-
-            // Reapply validation to newly added GPA input fields
-            applyGPAValidation();
-        });
-
-        // Remove row functionality
-        document.querySelector('#courseTable tbody').addEventListener('click', function(event) {
-            if (event.target.classList.contains('removeRowBtn')) {
-                event.target.closest('tr').remove();
-                updateSerialNumbers();
-            }
-        });
-
-        // Update serial numbers after removing a row
-        function updateSerialNumbers() {
-            const rows = document.querySelectorAll('#courseTable tbody tr');
-            rows.forEach((row, index) => {
-                row.querySelector('input[name*="[serialNo]"]').value = index + 1;
-            });
+// Store the course options in JavaScript arrays for later reuse
+const courseCodes = <?php 
+        $course_codes = [];
+        mysqli_data_seek($result, 0);
+        while ($course_row = mysqli_fetch_assoc($result)) {
+            $course_codes[] = $course_row['course_code'];
         }
+        echo json_encode($course_codes);
+    ?>;
+    
+    const courseCredits = <?php 
+        $course_credits = [];
+        mysqli_data_seek($result, 0);
+        while ($course_row = mysqli_fetch_assoc($result)) {
+            $course_credits[] = $course_row['course_credit'];
+        }
+        echo json_encode($course_credits);
+    ?>;
 
-        // Expandable input fields
-        document.querySelectorAll('#courseTable input[type="text"], #courseTable input[type="number"]').forEach(input => {
-            input.addEventListener('input', function() {
-                const tempSpan = document.createElement('span');
-                document.body.appendChild(tempSpan);
-                tempSpan.innerText = this.value || this.placeholder;
-                tempSpan.style.fontSize = getComputedStyle(this).fontSize;
-                tempSpan.style.visibility = 'hidden';
-                tempSpan.style.position = 'absolute';
-                const width = tempSpan.offsetWidth + 20; // Add some padding
-                this.style.width = `${width}px`;
-                document.body.removeChild(tempSpan);
-            });
+    const courseTitles = <?php 
+        $course_titles = [];
+        mysqli_data_seek($result, 0);
+        while ($course_row = mysqli_fetch_assoc($result)) {
+            $course_titles[] = $course_row['course_title'];
+        }
+        echo json_encode($course_titles);
+    ?>;
+
+    // Add new row functionality
+    document.getElementById('addRowBtn').addEventListener('click', function() {
+        const tableBody = document.querySelector('#courseTable tbody');
+        const rowCount = tableBody.rows.length;
+
+        // Build course options dropdown for the new row
+        let courseCodeOptions = '<option value="" disabled selected>Select Course Code</option>';
+        courseCodes.forEach(code => {
+            courseCodeOptions += `<option value="${code}">${code}</option>`;
         });
+
+        let courseCreditOptions = '<option value="" disabled selected>Select Course Credit</option>';
+        courseCredits.forEach(credit => {
+            courseCreditOptions += `<option value="${credit}">${credit}</option>`;
+        });
+
+        let courseTitleOptions = '<option value="" disabled selected>Select Course Title</option>';
+        courseTitles.forEach(title => {
+            courseTitleOptions += `<option value="${title}">${title}</option>`;
+        });
+
+        const newRow = `
+            <tr>
+                <td><input type="number" class="form-control" name="courseDetails[${rowCount}][serialNo]" value="${rowCount + 1}" readonly></td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][year]" required>
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">১ম</option>
+                        <option value="2">২য়</option>
+                        <option value="3">৩য়</option>
+                        <option value="4">৪র্থ</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][semester]" required>
+                        <option value="" disabled selected>Select Semester</option>
+                        <option value="1">১ম</option>
+                        <option value="2">২য়</option>
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][courseCode]" required>
+                        ${courseCodeOptions}
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][courseCredit]" required>
+                        ${courseCreditOptions}
+                    </select>
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][courseTitle]" required>
+                        ${courseTitleOptions}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" step="0.01" class="form-control" name="courseDetails[${rowCount}][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)">
+                </td>
+                <td>
+                    <select class="form-select" name="courseDetails[${rowCount}][examType]" required>
+                        <option value="" disabled selected>Select Exam Type</option>
+                        <option value="Improvement">Improvement</option>
+                        <option value="Fail">Fail</option>
+                    </select>
+                </td>
+                <td><button type="button" class="btn btn-danger removeRowBtn">Remove</button></td>
+            </tr>
+        `;
+
+        tableBody.insertAdjacentHTML('beforeend', newRow);
+        applyGPAValidation(); // Reapply GPA validation for new row
+    });
+
+    // Remove row functionality
+    document.querySelector('#courseTable tbody').addEventListener('click', function(event) {
+        if (event.target.classList.contains('removeRowBtn')) {
+            event.target.closest('tr').remove();
+            updateSerialNumbers();
+        }
+    });
+
+    // Update serial numbers after removing a row
+    function updateSerialNumbers() {
+        const rows = document.querySelectorAll('#courseTable tbody tr');
+        rows.forEach((row, index) => {
+            row.querySelector('input[name*="[serialNo]"]').value = index + 1;
+        });
+    }
+
+    // Expandable input fields (optional enhancement)
+    document.querySelectorAll('#courseTable input[type="text"], #courseTable input[type="number"]').forEach(input => {
+        input.addEventListener('input', function() {
+            const tempSpan = document.createElement('span');
+            document.body.appendChild(tempSpan);
+            tempSpan.innerText = this.value || this.placeholder;
+            tempSpan.style.fontSize = getComputedStyle(this).fontSize;
+            tempSpan.style.visibility = 'hidden';
+            tempSpan.style.position = 'absolute';
+            const width = tempSpan.offsetWidth + 20; // Add some padding
+            this.style.width = `${width}px`;
+            document.body.removeChild(tempSpan);
+        });
+    });
+
 
         // Validate readmission semester
         document.getElementById('readmissionSemester').addEventListener('input', function() {

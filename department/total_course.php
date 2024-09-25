@@ -31,9 +31,10 @@ $result = $stmt->get_result();
             <tr>
                 <th>Serial No</th>
                 <th>Department Name</th>
-                <th>Course Code</th>
                 <th>Course Title</th>
-                <th>Credit Hour</th>
+                <th>Course Code</th>
+                
+                <th>Course Credit</th>
               
             </tr>
         </thead>
@@ -45,10 +46,11 @@ $result = $stmt->get_result();
                     $counter++;
                     echo "<tr>
                             <td>{$counter}</td>
+                            <td>{$row['dept_name']}</td>
                             <td>{$row['course_title']}</td>
                             <td>{$row['course_code']}</td>
-                            <td>{$row['credit_hour']}</td>
-                            <td>{$row['dept_name']}</td>
+                            <td>{$row['course_credit']}</td>
+                         
                            
                           </tr>";
                 }

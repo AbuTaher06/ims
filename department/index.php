@@ -114,6 +114,6 @@ include("../include/connect.php");
 
 <?php 
 
-use deptlogin;
+
 include("footer.php"); // Include footer file 
 ?>

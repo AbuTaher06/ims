@@ -1,57 +1,62 @@
 <?php
 if (session_status() == PHP_SESSION_NONE) {
-  session_start();
+    session_start();
 }
 ob_start();
+
 if (!isset($_SESSION['dept'])) {
-  header("Location: ../deptlogin.php");
-  ob_end_flush();
-  exit(); 
+    header("Location: ../adminlogin.php");
+    ob_end_flush();
+    exit();
 }
 
-$pageTitle = "Request";
-include("header.php"); 
-include("sidebar.php"); 
 include("../include/connect.php");
 
-$dept=$_SESSION['dept'];
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['id']) && isset($_POST['action'])) {
-        $studentId = $_POST['id'];
-        $action = $_POST['action'];
-
-        // Perform action based on the button clicked
-        if ($action === 'approve') {
-            // Update the status of the student to 'Approved' in the database
-            $updateSql = "UPDATE students SET status='Approved' WHERE id='$studentId'";
-            if (mysqli_query($conn, $updateSql)) {
-                echo "Student approved successfully";
-            } else {
-                echo "Error updating record: " . mysqli_error($conn);
-            }
-        } elseif ($action === 'reject') {
-            // Update the status of the student to 'Rejected' in the database
-            $updateSql = "UPDATE students SET status='Rejected' WHERE id='$studentId'";
-            if (mysqli_query($conn, $updateSql)) {
-                echo "Student rejected successfully";
-            } else {
-                echo "Error updating record: " . mysqli_error($conn);
-            }
+// Check if this is an AJAX request
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id']) && isset($_POST['action'])) {
+    $studentId = $_POST['id'];
+    $action = $_POST['action'];
+    
+    // Perform action based on the button clicked
+    if ($action === 'approve') {
+        $updateSql = "UPDATE students SET status='Approved' WHERE id='$studentId'";
+        if (mysqli_query($conn, $updateSql)) {
+            echo "Student approved successfully";
         } else {
-            echo "Invalid action";
+            echo "Error updating record: " . mysqli_error($conn);
+        }
+    } elseif ($action === 'reject') {
+        $updateSql = "UPDATE students SET status='Rejected' WHERE id='$studentId'";
+        if (mysqli_query($conn, $updateSql)) {
+            echo "Student rejected successfully";
+        } else {
+            echo "Error updating record: " . mysqli_error($conn);
         }
     } else {
-        echo "Missing parameters";
+        echo "Invalid action";
     }
-    exit; // Terminate the script after handling the AJAX request
+    
+    // Since it's an AJAX request, don't output any HTML or other content
+    exit();
 }
+
+// For regular page loading, include your header and other HTML
+$pageTitle = "Request";
+include("header.php");
+include("sidebar.php");
 ?>
+
+
 <main id="main" class="main">
-  <h2 class="mb-0 text-center bg-info">
-    <i class="fas fa-exclamation-circle"></i> Pending Student Request
-  </h2>
+    <h2 class="mb-0 text-center bg-info">
+        <i class="fas fa-exclamation-circle"></i> Pending  Request for Registration
+    </h2>
+    
+    <div id="messageBox" style="display: none; margin: 15px 0;"></div>
+
 <?php
-$sql="SELECT * FROM students WHERE status='Pending' AND department='$dept' ORDER BY data_reg ASC";
+$dept = $_SESSION['dept'];
+$sql = "SELECT * FROM students WHERE status='Pending' AND department='$dept' ORDER BY data_reg ASC";
 $res = mysqli_query($conn, $sql);
 
 $output = "
@@ -69,7 +74,7 @@ $output = "
     </tr>
 ";
 
-if (mysqli_num_rows($res) == 0) { // Check if there are no rows
+if (mysqli_num_rows($res) == 0) {
     $output .= "
         <tr>
             <td colspan='9' class='text-center'>No Pending Request</td>
@@ -78,79 +83,114 @@ if (mysqli_num_rows($res) == 0) { // Check if there are no rows
 } else {
     $i = 0;
     while ($row = mysqli_fetch_array($res)) {
-        $i++; 
-
+        $i++;
         $output .= "
-            <tr>
-                <td>".$i."</td>
-                <td>".$row['name']."</td>
-                <td>".$row['username']."</td>
-                <td>".$row['stud_id']."</td>
-                <td>".$row['email']."</td>
-                <td>".$row['phone']."</td>
-                <td>".$row['gender']."</td>
-                <td>".$row['session']."</td>
-                <td>
-                    <div class='col-md-12'>
-                        <div class='row'>
-                            <div class='col-md-6'>
-                                <button id='".$row['id']."' class='btn btn-success approve'>Approve</button>
-                            </div>
-                            <div class='col-md-6'>
-                                <button id='".$row['id']."' class='btn btn-danger reject'>Reject</button>
-                            </div>
+        <tr>
+            <td>".$i."</td>
+            <td>".$row['name']."</td>
+            <td>".$row['username']."</td>
+            <td>".$row['stud_id']."</td>
+            <td>".$row['email']."</td>
+            <td>".$row['phone']."</td>
+            <td>".$row['gender']."</td>
+            <td>".$row['session']."</td>
+            <td>
+                <div class='col-md-12'>
+                    <div class='row'>
+                        <div class='col-md-6'>
+                            <button class='btn btn-success approve' data-id='".$row['id']."' style='display: flex; align-items: center;'>
+                                <i class='fas fa-check' style='margin-right: 5px;'></i> Approve
+                            </button>
+                        </div>
+                        <div class='col-md-6'>
+                            <button class='btn btn-danger reject' data-id='".$row['id']."' style='display: flex; align-items: center;'>
+                                <i class='fas fa-times' style='margin-right: 5px;'></i> Reject
+                            </button>
                         </div>
                     </div>
-                </td>
-            </tr>
+                </div>
+            </td>
+        </tr>
         ";
     }
 }
 
 $output .= "</table>";
-
-echo $output; // This will send the generated HTML back to the AJAX request
+echo $output;
 ?>
+
 </main>
+<style>
+  #messageBox {
+      font-size: 1.2em;
+      margin: 15px 0;
+  }
+  .text-success {
+      color: green;
+  }
+  .text-danger {
+      color: red;
+  }
+  </style>
+
 <script>
 $(document).ready(function() {
-  // Approve button click event
-  $(document).on("click", ".approve", function() {
-    var id = $(this).attr("id");
-    $.ajax({
-      url: "<?php echo $_SERVER['PHP_SELF']; ?>",
-      method: "POST",
-      data: {id: id, action: "approve"},
-      success: function(response) {
-        alert(response); // Show success message
-        // You may reload the table here if needed
-        window.location.reload();
-      },
-      error: function(xhr, status, error) {
-        console.error(xhr.responseText); // Log error message
-      }
-    });
-  });
+    // Approve button click event
+    $(document).on("click", ".approve", function() {
+        var id = $(this).data("id");
+        var button = $(this);
 
-  // Reject button click event
-  $(document).on("click", ".reject", function() {
-    var id = $(this).attr("id");
-    $.ajax({
-      url: "<?php echo $_SERVER['PHP_SELF']; ?>",
-      method: "POST",
-      data: {id: id, action: "reject"},
-      success: function(response) {
-        alert(response); // Show success message
-        // You may reload the table here if needed
-        window.location.reload();
-      },
-      error: function(xhr, status, error) {
-        console.error(xhr.responseText); // Log error message
-      }
+        var confirmed = confirm("Are you sure you want to approve this request?");
+        if (confirmed) {
+            button.prop("disabled", true);
+            $.ajax({
+                url: "<?php echo $_SERVER['PHP_SELF']; ?>",
+                method: "POST",
+                data: {id: id, action: "approve"},
+                success: function(response) {
+                    $("#messageBox").text("Student approved successfully!").removeClass("text-danger").addClass("text-success").show();
+                    setTimeout(function() {
+                        window.location.reload(); // Reload page after a short delay
+                    }, 2000);
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    button.prop("disabled", false);
+                    $("#messageBox").text("Error approving student.").removeClass("text-success").addClass("text-danger").show();
+                }
+            });
+        }
     });
-  });
+
+    // Reject button click event
+    $(document).on("click", ".reject", function() {
+        var id = $(this).data("id");
+        var button = $(this);
+
+        var confirmed = confirm("Are you sure you want to reject this request?");
+        if (confirmed) {
+            button.prop("disabled", true);
+            $.ajax({
+                url: "<?php echo $_SERVER['PHP_SELF']; ?>",
+                method: "POST",
+                data: {id: id, action: "reject"},
+                success: function(response) {
+                    $("#messageBox").text("Student rejected successfully!").removeClass("text-danger").addClass("text-success").show();
+                    setTimeout(function() {
+                        window.location.reload(); // Reload page after a short delay
+                    }, 2000);
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    button.prop("disabled", false);
+                    $("#messageBox").text("Error rejecting student.").removeClass("text-success").addClass("text-danger").show();
+                }
+            });
+        }
+    });
 });
 </script>
+
 
 <?php 
 include('footer.php');

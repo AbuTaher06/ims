@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($deptId) {
         // Prepare and bind for inserting the course
-        $stmt = $conn->prepare("INSERT INTO courses (course_code, course_title, credit_hour, department_id,dept_name) VALUES (?, ?, ?, ?,?)");
+        $stmt = $conn->prepare("INSERT INTO courses (course_code, course_title, course_credit, department_id,dept_name) VALUES (?, ?, ?, ?,?)");
         $stmt->bind_param("ssiis", $courseCode, $courseTitle, $creditHour, $deptId, $deptName);
 
         if ($stmt->execute()) {
