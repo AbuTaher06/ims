@@ -1,56 +1,57 @@
 <?php
 if (session_status() == PHP_SESSION_NONE) {
-  session_start();
+    session_start();
 }
 ob_start();
 if (!isset($_SESSION['dept'])) {
-  header("Location: ../deptlogin.php");
-  ob_end_flush();
-  exit(); 
+    header("Location: ../deptlogin.php");
+    ob_end_flush();
+    exit();
 }
 
-$pageTitle = "Student";
-include("header.php"); 
-include("sidebar.php"); 
+$pageTitle = "Student | Profile";
+include("header.php");
+include("sidebar.php");
 include("../include/connect.php");
 ?>
-    <!-- ... other head elements ... -->
-    <style>
+<!-- ... other head elements ... -->
+<style>
     .custom-table-header {
-    background: linear-gradient(to right, #FFA500, #FF6347); /* Gradient background */
-    color: #ffffff; /* Text color */
-    border: 1px solid #fff; /* Border to separate cells */
-    padding: 8px 12px;
-}
+        background: linear-gradient(to right, #FFA500, #FF6347); /* Gradient background */
+        color: #ffffff; /* Text color */
+        border: 1px solid #fff; /* Border to separate cells */
+        padding: 8px 12px;
+    }
 
-.custom-table-header a {
-    color: #ffffff; /* Link color in the header */
-}
+    .custom-table-header a {
+        color: #ffffff; /* Link color in the header */
+    }
 
-/* Add hover effect for better user interaction */
+    /* Add hover effect for better user interaction */
+</style>
 
-
-    </style>
 <main id="main" class="main">
     <div class="container-fluid">
         <div class="col-md-12">
             <div class="row">
-              
+
                 <div class="col-md-10">
                     <h4 class="text-center my-3 text-primary">Total Student</h4>
 
                     <?php
-                 
-                 $dept=$_SESSION['dept'];
-              
+                    $dept = $_SESSION['dept'];
+
                     // Fetch distinct sessions from the database
-                    $session_query = "SELECT DISTINCT session FROM students WHERE department='$dept'";
-                    $session_result = mysqli_query($conn, $session_query);
-                    $sessions = mysqli_fetch_all($session_result, MYSQLI_ASSOC);
+                    $session_query = "SELECT DISTINCT session FROM students WHERE department=? and status='Approved'";
+                    $stmt = $conn->prepare($session_query);
+                    $stmt->bind_param("s", $dept); // bind the department parameter
+                    $stmt->execute();
+                    $session_result = $stmt->get_result();
+                    $sessions = $session_result->fetch_all(MYSQLI_ASSOC);
                     ?>
 
                     <!-- Dropdown to filter students by session -->
-                
+
                     <form method="post" style="margin-bottom: 20px;">
                         <label for="session"><h3>Select session:</h3></label>
                         <select name="session" id="session" class="form-control" onchange="this.form.submit()">
@@ -62,41 +63,50 @@ include("../include/connect.php");
                             }
                             ?>
                         </select>
-                        
                     </form>
 
                     <?php
                     $selected_session = isset($_POST['session']) ? $_POST['session'] : '';
 
-                    $query = "SELECT * FROM students WHERE department='$dept'";
+                    // Build the main query
+                    $query = "SELECT * FROM students WHERE department=? AND status='Approved'";
                     if (!empty($selected_session)) {
-                        // If a session is selected, add a condition to the query
-                        $query .= " WHERE session = '$selected_session'";
+                        // Add a condition for session if selected
+                        $query .= " AND session=?";
                     }
 
-                    $res = mysqli_query($conn, $query);
+                    // Prepare the query
+                    if (!empty($selected_session)) {
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("ss", $dept, $selected_session); // Bind both department and session
+                    } else {
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("s", $dept); // Bind only department
+                    }
+
+                    $stmt->execute();
+                    $res = $stmt->get_result();
 
                     $output = "
                         <table class='table table-striped' id='studentTable'>
                             <thead class='custom-table-header'>
-                                <tr class=' bg bg-secondary'>
+                                <tr class='bg bg-secondary'>
                                     <th>ID</th>
                                     <th>Name</th>
                                     <th>Username</th>
                                     <th>Stud_ID</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    
                                     <th>Session</th>
-                                   <!-- <th>Add Result</th>
-                                   <th>View Result</th> --!>
+                                    <!-- <th>Add Result</th>
+                                    <th>View Result</th> -->
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                         ";
 
-                    if (mysqli_num_rows($res) < 1) {
+                    if ($res->num_rows < 1) {
                         $output .= "
                             <tr>
                                 <td class='text-center' colspan='10'>No students yet</td>
@@ -104,7 +114,7 @@ include("../include/connect.php");
                         ";
                     }
 
-                    while ($row = mysqli_fetch_array($res)) {
+                    while ($row = $res->fetch_assoc()) {
                         $output .= "
                             <tr>
                                 <td>" . $row['id'] . "</td>
@@ -113,7 +123,6 @@ include("../include/connect.php");
                                 <td>" . $row['stud_id'] . "</td>
                                 <td>" . $row['email'] . "</td>
                                 <td>" . $row['phone'] . "</td>
-                                
                                 <td>" . $row['session'] . "</td>
                                 <!--
                                 <td>
@@ -126,7 +135,7 @@ include("../include/connect.php");
                                         <button class='btn btn-success'>View Result</button>
                                     </a>
                                 </td>
-                                --!>
+                                -->
                                 <td>
                                     <a href='view.php?id=" . $row['id'] . "&name=" . $row['username'] . "'>
                                         <button class='btn btn-info'>View Profile</button>
@@ -142,19 +151,18 @@ include("../include/connect.php");
 
                     echo $output;
                     ?>
-              
                 </div>
             </div>
         </div>
     </div>
 </main>
 
-    <script>
-        $(document).ready(function () {
-            $('#studentTable').DataTable();
-        });
-    </script>
-     <?php 
-        include("../footer.php");
-        ?>
+<script>
+    $(document).ready(function () {
+        $('#studentTable').DataTable();
+    });
+</script>
 
+<?php
+include("../footer.php");
+?>

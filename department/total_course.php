@@ -9,7 +9,7 @@ if (!isset($_SESSION['dept'])) {
     exit(); 
 }
 
-$pageTitle = "Add Course";
+$pageTitle = "Student | Profile";
 include("header.php"); 
 include("sidebar.php"); 
 include("../include/connect.php");

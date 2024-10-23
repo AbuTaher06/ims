@@ -169,27 +169,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="mb-3">
-            <label for="studentNameBangla" class="form-label">২। ক) নাম (বাংলা):</label>
-            <input type="text" class="form-control" id="studentNameBangla" name="studentNameBangla" placeholder="আপনার বাংলা নাম লিখুন" required>
-        </div>
+    <label class="form-label">২। নাম:</label>
+    
+    <!-- Subsection for Bangla name -->
+    <div style="margin-left: 20px; margin-top: 10px;">
+        <label for="studentNameBangla" class="form-label"> ক) নাম (বাংলা):</label>
+        <input type="text" class="form-control" id="studentNameBangla" name="studentNameBangla" placeholder="আপনার বাংলা নাম লিখুন" required>
+    </div>
+
+    <!-- Subsection for English name -->
+    <div style="margin-left: 20px; margin-top: 10px;">
+        <label for="studentNameEnglish" class="form-label">খ) নাম (ইংরেজি):</label>
+        <input type="text" class="form-control" id="studentNameEnglish" name="studentNameEnglish" placeholder="আপনার ইংরেজি নাম লিখুন" required>
+    </div>
+</div>
+
 
         <div class="mb-3">
-            <label for="studentNameEnglish" class="form-label">  খ) নাম (ইংরেজি):</label>
-            <input type="text" class="form-control" id="studentNameEnglish" name="studentNameEnglish" placeholder="আপনার ইংরেজি নাম লিখুন" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="fatherName" class="form-label">৪। পিতার নাম:</label>
+            <label for="fatherName" class="form-label">৩। পিতার নাম:</label>
             <input type="text" class="form-control" id="fatherName" name="fatherName" placeholder="আপনার পিতার নাম লিখুন" required>
         </div>
 
         <div class="mb-3">
-            <label for="motherName" class="form-label">৫। মাতার নাম:</label>
+            <label for="motherName" class="form-label">৪। মাতার নাম:</label>
             <input type="text" class="form-control" id="motherName" name="motherName" placeholder="আপনার মাতার নাম লিখুন" required>
         </div>
 
         <div class="mb-3">
-        <label for="currentSession" class="form-label">৬। বর্তমান শিক্ষাবর্ষ:</label>
+        <label for="currentSession" class="form-label">৫। বর্তমান শিক্ষাবর্ষ:</label>
             <select class="form-select" id="currentSession" name="currentSession" required onchange="updatenextSession()">
                 <option selected disabled>বর্তমান শিক্ষাবর্ষ নির্বাচন করুন</option>
                 <option value="2018-19">2018-2019</option>
@@ -242,6 +249,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       
     <table class="table table-bordered" id="courseTable">
     <thead>
+    <div class="mb-3">
+        <label for="totalCredits" class="form-label">Total Credits:</label>
+        <input type="text" class="form-control" id="totalCredits" name="totalCredits" readonly>
+    </div>
+
         <tr class="bg-primary text-white">
             <th scope="col">ক্রমিক নং</th>
             <th scope="col">বর্ষ</th>
@@ -284,7 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $student_row = mysqli_fetch_assoc($result_info);
                     $dept = $student_row['department'];
 
-                    $course_info = "SELECT * FROM courses WHERE dept_name='$dept'";
+                    $course_info = "SELECT DISTINCT course_code,course_title,course_credit FROM courses WHERE dept_name='$dept'";
                     $result = mysqli_query($conn, $course_info);
 
                     while ($course_row = mysqli_fetch_assoc($result)) {

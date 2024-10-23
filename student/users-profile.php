@@ -84,6 +84,7 @@ if (isset($_POST['update_profile'])) {
             $error = "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         }
 
+        
         // If no errors, try to upload the file
         if (!isset($error)) {
             if (move_uploaded_file($_FILES["profile_pic"]["tmp_name"], $target_dir . $new_filename)) {

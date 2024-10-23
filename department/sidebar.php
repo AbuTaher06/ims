@@ -41,12 +41,7 @@
         <span>F.A.Q</span>
       </a>
     </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-contact.php">
-        <i class="bi bi-envelope"></i>
-        <span>Contact</span>
-      </a>
-    </li>
+  
     <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="pages-contact.php">
         <i class="bi bi-envelope"></i>

@@ -41,6 +41,7 @@ include("../include/connect.php");
                     <div class="card mt-4">
                         <div class="card-body">
                             <h5 class="card-title text-center" style="color:#fff; background:orange; margin:0; padding:8px;">Total Selected Students for Improvement</h5>
+                            <div id="result" class="animate__animated"> <!-- Animation class will be added here -->
                             <?php
                             // Get selected year and semester from the form
                             $selected_year = isset($_POST['year']) ? $_POST['year'] : '';
@@ -137,6 +138,7 @@ include("../include/connect.php");
                                 echo "<p>No data available for the selected filters.</p>";
                             }
                             ?>
+                            </div> <!-- End of result div -->
                         </div>
                     </div>
                 </div>
@@ -146,3 +148,16 @@ include("../include/connect.php");
 </main>
 
 <?php include("footer.php"); ?>
+
+<script>
+    // Function to add animation classes when the form is submitted
+    document.querySelectorAll('select').forEach(function(select) {
+        select.addEventListener('change', function() {
+            // Add animation class
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.remove('animate__fadeIn');
+            void resultDiv.offsetWidth; // Trigger reflow
+            resultDiv.classList.add('animate__fadeIn');
+        });
+    });
+</script>

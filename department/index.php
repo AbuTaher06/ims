@@ -11,7 +11,7 @@ if (!isset($_SESSION['dept'])) {
   exit(); 
 }
 
-$pageTitle = "Dashboard";
+$pageTitle = "Department | Dashboard";
 include("header.php"); 
 include("sidebar.php"); 
 include("../include/connect.php");
@@ -60,18 +60,19 @@ include("../include/connect.php");
     </div>
 
     <div class="col-lg-4 col-md-6">
-      <div class="card text-center bg-warning">
+      <div class="card text-center  bg-success">
         <div class="card-body">
         <?php
-            $std=mysqli_query($conn,"select * from students where status='Pending'");
-            $t_s=mysqli_num_rows($std);
+            $dept=mysqli_query($conn,"select * from department");
+            $T_d=mysqli_num_rows($dept);
             ?>
-          <h5 class="card-title">Improvement Accepted</h5>
-          <p class="card-text"><?php echo $t_s; ?></p> <!-- Replace with dynamic count -->
-          <a href="accepted_request.php" class="btn btn-primary">View Details</a>
+          <h5 class="card-title">Improvement Request</h5>
+          <p class="card-text"><?php echo $T_d; ?></p> <!-- Replace with dynamic count -->
+          <a href="pending_request.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
+   
   </div><!-- End Dashboard Cards Row -->
   <div class="row">
     <div class="col-lg-4 col-md-6 ">
@@ -85,16 +86,18 @@ include("../include/connect.php");
     </div>
 
 
+  
+
     <div class="col-lg-4 col-md-6">
-      <div class="card text-center  bg-success">
+      <div class="card text-center bg-warning">
         <div class="card-body">
         <?php
-            $dept=mysqli_query($conn,"select * from department");
-            $T_d=mysqli_num_rows($dept);
+            $std=mysqli_query($conn,"select * from students where status='Pending'");
+            $t_s=mysqli_num_rows($std);
             ?>
-          <h5 class="card-title">Improvement Request</h5>
-          <p class="card-text"><?php echo $T_d; ?></p> <!-- Replace with dynamic count -->
-          <a href="pending_request.php" class="btn btn-primary">View Details</a>
+          <h5 class="card-title">Registered Students</h5>
+          <p class="card-text"><?php echo $t_s; ?></p> <!-- Replace with dynamic count -->
+          <a href="student.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
@@ -102,9 +105,9 @@ include("../include/connect.php");
     <div class="col-lg-4 col-md-6">
       <div class="card text-center bg-danger">
         <div class="card-body">
-          <h5 class="card-title">Total Pending xxxxxxt</h5>
+          <h5 class="card-title">Total Improvement</h5>
           <p class="card-text">3</p> <!-- Replace with dynamic count -->
-          <a href="pending_request.php" class="btn btn-primary">View Details</a>
+          <a href="improvement.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>

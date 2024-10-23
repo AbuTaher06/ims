@@ -16,6 +16,7 @@ include("../include/connect.php");
     .form-group-inputs .form-control {
       margin-bottom: 0.5rem; /* Adjust the margin as needed */
     }
+    
   </style>
 <?php
 // Check if the form is submitted
@@ -56,8 +57,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="password">Password</label>
                 <input type="password" class="form-control" id="password" name="password" placeholder="Enter a password" required>
               </div>
+              <button type="submit" class="btn btn-success w-100 mt-3">Add</button>
 
-              <button type="submit" class="btn btn-success btn-block mt-3">Submit</button>
+
             </form>
           </div>
         </div>

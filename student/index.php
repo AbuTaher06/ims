@@ -12,7 +12,7 @@ if (!isset($_SESSION['email'])) {
 }
 */
 
-$pageTitle = "Home";
+$pageTitle = "Student Dashboard";
 include("header.php"); // Include header file
 include("sidebar.php"); // Include sidebar file
 include("../include/connect.php");
@@ -45,7 +45,7 @@ $t_a=mysqli_num_rows($a);
     <div class="col-lg-4 col-md-6">
       <div class="card text-center bg-warning">
         <div class="card-body">
-          <h5 class="card-title">Pending</h5>
+          <h5 class="card-title">Pending Request</h5>
           <p class="card-text"><?php echo $t_p; ?></p> <!-- Replace with dynamic count -->
           <a href="pending_request.php" class="btn btn-primary">View Details</a>
         </div>
@@ -54,18 +54,18 @@ $t_a=mysqli_num_rows($a);
     <div class="col-lg-4 col-md-6">
       <div class="card text-center  bg-success">
         <div class="card-body">
-          <h5 class="card-title">Accepted</h5>
+          <h5 class="card-title">Accepted Request</h5>
           <p class="card-text"><?php echo $t_a; ?></p> <!-- Replace with dynamic count -->
-          <a href="improvement.php" class="btn btn-primary">View Details</a>
+          <a href="selected.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
     <div class="col-lg-4 col-md-6 ">
       <div class="card text-center bg-info">
         <div class="card-body">
-          <h5 class="card-title">Requested</h5>
+          <h5 class="card-title">Total Improvement</h5>
           <p class="card-text">10</p> <!-- Replace with dynamic count -->
-          <a href="#" class="btn btn-primary">View Details</a>
+          <a href="improvement.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>

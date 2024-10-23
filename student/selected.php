@@ -99,9 +99,7 @@ include("../include/connect.php");
                                             <th class='bg-info'>Course Code</th>
                                             <th class='bg-info'>Course Name</th>
                                             <th class='bg-info'>Credit Hour</th>
-                                            <th class='bg-info'>Previous CGPA</th>
-                                            <th class='bg-info'>Improved CGPA</th>
-
+                                            <th class='bg-info'>GPA Obtained</th>
                                         </tr></thead>";
                                     echo "<tbody>";
                                     foreach ($courses as $course) {
@@ -111,7 +109,6 @@ include("../include/connect.php");
                                                 <td>" . $course['courseTitle'] . "</td>
                                                 <td>" . $course['courseCredit'] . "</td>
                                                 <td>" . $course['gpaObtained'] . "</td>
-                                                <td>N/A</td>
                                               </tr>";
                                     }
                                     echo "</tbody></table>";

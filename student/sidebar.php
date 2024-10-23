@@ -23,7 +23,7 @@
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link collapsed" href="view_reports.php">
+      <a class="nav-link collapsed" href="show.php">
         <i class="bi bi-book"></i>
         <span>My Submitted Request</span>
       </a>

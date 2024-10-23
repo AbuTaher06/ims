@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id']) && isset($_POST[
 }
 
 // For regular page loading, include your header and other HTML
-$pageTitle = "Request";
+$pageTitle = "Registration | Request";
 include("header.php");
 include("sidebar.php");
 ?>
