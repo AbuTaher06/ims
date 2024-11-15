@@ -32,6 +32,7 @@ if(count($error)==0){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login Page</title>
+    <link href="include/jkkniu.png" rel="icon">
     <!-- Include Bootstrap CSS -->
     <link href="uploads/jkkniu.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">

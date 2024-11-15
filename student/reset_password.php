@@ -87,34 +87,30 @@ if (isset($_POST['reset_password'])) {
     }
 }
 ?>
-<!-- Your HTML Form for OTP and new password input and submit button -->
-<!-- reset_password.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Reset</title>
-    <!-- Add your CSS stylesheets or include Bootstrap if needed -->
-    
-</head>
-<body>
-    <div class="reset-password-container">
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Password Reset</title>
-    <!-- Add your stylesheets or use Bootstrap if needed -->
-    <link rel="stylesheet" href="path/to/your/styles.css">
+    <link href="../asset/images/jkkniu.png" rel="icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+        }
+        .card {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Card shadow effect */
+        }
+    </style>
 </head>
 <body>
 
 <!-- Your Header Goes Here -->
-<?php include("../include/header.php"); ?>
+<?php include("head1.php"); ?>
 
-<div class="container">
+<div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
@@ -140,24 +136,27 @@ if (isset($_POST['reset_password'])) {
                             <input type="password" id="con_password" name="con_password" class="form-control" required>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group mt-2">
                             <button type="submit" name="reset_password" class="btn btn-primary btn-block">Reset Password</button>
                         </div>
                     </form>
+                    <!-- Back to Home Button -->
+                    
                 </div>
+                
+            </div>
+            <div class="form-group mt-3">
+                        <a href="../index.php" class="btn btn-secondary btn-block">Back to Home</a>
             </div>
         </div>
+        
     </div>
 </div>
 
 <!-- Your Footer Goes Here -->
-<?php include("../footer.php"); ?>
+<?php include("footer.php"); ?>
 
-<!-- Add your scripts or use Bootstrap scripts if needed -->
-<script src="path/to/your/scripts.js"></script>
-</body>
-</html>
-
-    </div>
+<!-- Bootstrap JS (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

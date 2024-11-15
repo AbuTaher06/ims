@@ -1,43 +1,48 @@
 <?php
 session_start();
-
 include("include/connect.php");
-if(isset($_POST["login"])){
+
+if (isset($_POST["login"])) {
     $username = $_POST["uname"];
     $password = $_POST["pass"];
-    $error=array();
-    if(empty($username)){
-        $error["dept"] = "Enter Username";
-}
-else if(empty($password)){
-    $error["dept"] = "Enter password";
-}
-if(count($error)==0){
-    $sql = "select *from department where username='$username' and password='$password' ";
-    $result = mysqli_query($conn,$sql);
-    if(mysqli_num_rows($result)==1){
-        echo "<script>alert('You have login as dept')</script>";
-        $_SESSION['dept']=$username;
-        header('location:department/index.php');
-        exit();
+    $error = array();
+
+    // Validate inputs
+    if (empty($username)) {
+        $error["controller"] = "Enter Username";
+    } else if (empty($password)) {
+        $error["controller"] = "Enter Password";
     }
-    else{
-        echo "<script>alert('Invalid Username and Password')</script>";
+
+    if (count($error) == 0) {
+        // Query to fetch the Exam Controller
+        $sql = "SELECT * FROM controllers WHERE username='$username' AND password='$password'";
+        $result = mysqli_query($conn, $sql);
+
+        // Check if login is successful
+        if (mysqli_num_rows($result) == 1) {
+            echo "<script>alert('You have logged in as Exam Controller')</script>";
+            $_SESSION['controller'] = $username;
+            header('location:examController/index.php'); // Redirect to Exam Controller dashboard
+            exit();
+        } else {
+            echo "<script>alert('Invalid Username and Password')</script>";
+        }
     }
-}
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>department Login Page</title>
+    <title>Exam Controller Login Page</title>
     <link href="include/jkkniu.png" rel="icon">
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-       body {
+        body {
             background-image: url('background-image.jpg'); /* Replace 'background-image.jpg' with your actual image path */
             background-repeat: no-repeat;
             background-size: cover;
@@ -58,8 +63,7 @@ if(count($error)==0){
             <div class="col-md-6">
                 <div class="jumbotron shadow">
                     <div class="text-center">
-                        <!-- <img src="images/dept.jpeg" class="img-fluid" alt="dept Image"> -->
-                        <h3>Department Login</h3>
+                        <h3>Exam Controller Login</h3>
                     </div>
                     
                     <div class="card mx-auto mt-5" style="max-width: 400px;">
@@ -67,8 +71,8 @@ if(count($error)==0){
                             <form method="post" class="my-2">
                                 <div>
                                     <?php
-                                        if(isset($error["dept"])){
-                                            $sh = $error['dept'];
+                                        if (isset($error["controller"])) {
+                                            $sh = $error['controller'];
                                             $show = "<h4 class='alert alert-danger'>$sh</h4>";
                                             echo $show;
                                         } else {
@@ -79,7 +83,7 @@ if(count($error)==0){
 
                                 <div class="form-group">
                                     <label for="uname">Username</label>
-                                    <input type="text" name="uname" class="form-control" autocomplete="off" placeholder="Enter Username" value="<?php if(isset($_POST['uname'])) echo $_POST['uname'];?>">
+                                    <input type="text" name="uname" class="form-control" autocomplete="off" placeholder="Enter Username" value="<?php if (isset($_POST['uname'])) echo $_POST['uname']; ?>">
                                 </div>
 
                                 <div class="form-group">
@@ -96,9 +100,7 @@ if(count($error)==0){
             </div>
         </div>
     </div>
-    <?php 
-    include("footer.php");
-    ?>
+    <?php include("footer.php"); ?>
 
     <!-- Include Bootstrap JS and Popper.js -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

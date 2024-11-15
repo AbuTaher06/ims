@@ -1,6 +1,5 @@
 <?php
 
-
 if (session_status() == PHP_SESSION_NONE) {
   session_start();
 }
@@ -16,7 +15,27 @@ include("header.php");
 include("sidebar.php"); 
 include("../include/connect.php");
 ?>
+<style>
+.bg-purple {
+    background-color: #6f42c1; /* A vibrant purple */
+    color: white; /* Ensure text is readable */
+}
 
+.marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: scroll 10s linear infinite; /* Adjust the duration as needed */
+  }
+
+  @keyframes scroll {
+    0% {
+      transform: translateX(100%); /* Start from right */
+    }
+    100% {
+      transform: translateX(-100%); /* Move all the way to left */
+    }
+  }
+</style>
 <main id="main" class="main">
 
   <div class="pagetitle">
@@ -29,94 +48,146 @@ include("../include/connect.php");
     </nav>
   </div><!-- End Page Title -->
 
+
+  <div class="col text-center">
+  <div class="alert" style="background: linear-gradient(90deg, #1a1a1a, #000000); color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); overflow: hidden;">
+    <div class="marquee">
+      <h3 class="text-center" style="margin: 0; font-weight: bold; font-size: 24px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);">
+        COMPUTER SCIENCE AND ENGINEERING DEPARTMENT
+      </h3>
+    </div>
+  </div>
+</div>
+
   <div class="row">
+    <!-- Total Students -->
     <div class="col-lg-4 col-md-6 ">
       <div class="card text-center bg-info">
         <div class="card-body">
           <?php
-          $dept=$_SESSION['dept'];
-            $ad=mysqli_query($conn,"select * from students where department='$dept'");
-            $num=mysqli_num_rows($ad);
-            ?>
+          $dept = $_SESSION['dept'];
+          $ad = mysqli_query($conn, "SELECT * FROM students WHERE department='$dept'");
+          $num = mysqli_num_rows($ad);
+          ?>
           <h5 class="card-title">Total Student</h5>
-          <p class="card-text"><?php echo $num; ?></p> <!-- Replace with dynamic count -->
-          <a href="student.php" class="btn btn-primary">View Details</a>
+          <p class="card-text"><?php echo $num; ?></p> 
+          <a href="student.php" class="btn btn-light">View Details</a>
         </div>
       </div>
     </div>
 
+    <!-- Registration Requests -->
     <div class="col-lg-4 col-md-6">
-      <div class="card text-center  bg-warning">
+      <div class="card text-center bg-primary">
         <div class="card-body">
         <?php
-            $std=mysqli_query($conn,"select * from courses where dept_name='$dept'");
-            $t_c=mysqli_num_rows($std);
-            ?>
+          $dept = $_SESSION['dept'];
+          $tr = mysqli_query($conn, "SELECT * FROM students WHERE department='$dept' AND status='pending'");
+          $r = mysqli_num_rows($tr);
+          ?>
+          <h5 class="card-title">Registration Request</h5>
+          <p class="card-text"><?php echo $r ?></p> <!-- Replace with dynamic count -->
+          <a href="student_request.php" class="btn btn-light">View Details</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exam Participation Requests (Row 1) -->
+    <div class="col-lg-4 col-md-6">
+      <div class="card text-center bg-secondary">
+        <div class="card-body">
+          <?php
+          $primary_request = mysqli_query($conn, "SELECT * FROM exam_requests WHERE status='pending' AND department='$dept'");
+          $primary_count = mysqli_num_rows($primary_request);
+          ?>
+          <h5 class="card-title">Exam Participation Request</h5>
+          <p class="card-text"><?php echo $primary_count; ?></p>
+          <a href="exam_participation_request.php" class="btn btn-light">View Details</a>
+        </div>
+      </div>
+    </div>
+    
+  </div><!-- End Dashboard Cards Row -->
+
+  <div class="row">
+    <!-- Total Courses -->
+    <div class="col-lg-4 col-md-6">
+      <div class="card text-center bg-warning">
+        <div class="card-body">
+          <?php
+          $std = mysqli_query($conn, "SELECT * FROM courses WHERE dept_name='$dept'");
+          $t_c = mysqli_num_rows($std);
+          ?>
           <h5 class="card-title">Total Course</h5>
-          <p class="card-text"><?php echo $t_c; ?></p> <!-- Replace with dynamic count -->
+          <p class="card-text"><?php echo $t_c; ?></p> 
           <a href="total_course.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
 
+    <!-- Registered Students -->
     <div class="col-lg-4 col-md-6">
-      <div class="card text-center  bg-success">
+      <div class="card text-center bg-danger">
         <div class="card-body">
-        <?php
-            $dept=mysqli_query($conn,"select * from department");
-            $T_d=mysqli_num_rows($dept);
-            ?>
-          <h5 class="card-title">Improvement Request</h5>
-          <p class="card-text"><?php echo $T_d; ?></p> <!-- Replace with dynamic count -->
-          <a href="pending_request.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
-   
-  </div><!-- End Dashboard Cards Row -->
-  <div class="row">
-    <div class="col-lg-4 col-md-6 ">
-      <div class="card text-center bg-primary">
-        <div class="card-body">
-          <h5 class="card-title">Registration Request</h5>
-          <p class="card-text">10</p> <!-- Replace with dynamic count -->
-          <a href="student_request.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
-
-
-  
-
-    <div class="col-lg-4 col-md-6">
-      <div class="card text-center bg-warning">
-        <div class="card-body">
-        <?php
-            $std=mysqli_query($conn,"select * from students where status='Pending'");
-            $t_s=mysqli_num_rows($std);
-            ?>
+          <?php
+          $std = mysqli_query($conn, "SELECT * FROM students WHERE department='$dept' AND status='Approved'");
+          $t_s = mysqli_num_rows($std);
+          ?>
           <h5 class="card-title">Registered Students</h5>
-          <p class="card-text"><?php echo $t_s; ?></p> <!-- Replace with dynamic count -->
+          <p class="card-text"><?php echo $t_s; ?></p> 
           <a href="student.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
 
+    <!-- Selected for Improvement Requests (Row 1) -->
     <div class="col-lg-4 col-md-6">
-      <div class="card text-center bg-danger">
+      <div class="card text-center bg-success">
         <div class="card-body">
-          <h5 class="card-title">Total Improvement</h5>
-          <p class="card-text">3</p> <!-- Replace with dynamic count -->
-          <a href="improvement.php" class="btn btn-primary">View Details</a>
+          <?php
+          $selected_for_improvement = mysqli_query($conn, "SELECT * FROM exam_participation_list WHERE status='approved' AND department='$dept'");
+          $selected_count = mysqli_num_rows($selected_for_improvement);
+          ?>
+          <h5 class="card-title">Selected for Improvement</h5>
+          <p class="card-text"><?php echo $selected_count; ?></p>
+          <a href="selected_for_improvement.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
+
   </div><!-- End Dashboard Cards Row -->
+
+  <div class="row">
+    <!-- Improvement Exam Requests -->
+    <div class="col-lg-6 col-md-6">
+      <div class="card text-center bg-purple">
+        <div class="card-body">
+          <?php
+          // $T_d = mysqli_query($conn, "SELECT * FROM exam_requests WHERE status='pending' AND department='$dept'");
+          // $improvement_count = mysqli_num_rows($T_d);
+          // ?>
+          <h5 class="card-title">Improvement Exam Request</h5>
+          <p class="card-text">0</p> 
+          <a href="pending_request.php" class="btn btn-light">View Details</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Improvement -->
+    <div class="col-lg-6 col-md-6">
+      <div class="card text-center bg-danger">
+        <div class="card-body">
+          <h5 class="card-title">Improvement Results</h5>
+          <p class="card-text">0</p> <!-- Replace with dynamic count -->
+          <a href="improvementg.php" class="btn btn-light">View Details</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- End Exam Request/Selection Cards Row -->
 
 </main><!-- End #main -->
 
-<?php 
 
 
-include("footer.php"); // Include footer file 
-?>
+<?php include("footer.php"); ?>

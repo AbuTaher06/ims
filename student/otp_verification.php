@@ -15,7 +15,7 @@ if (isset($_POST['verify_otp'])) {
 
     if (mysqli_num_rows($result) > 0) {
         // OTP is correct, update user status to 'verified'
-        $update_sql = "UPDATE students SET status = 'verified' WHERE email = '$email'";
+        $update_sql = "UPDATE students SET otp_status = '1' WHERE email = '$email'";
         mysqli_query($conn, $update_sql);
         echo "<script>alert('OTP verified Successfully .')</script>";
         // Set session variables for user email and status
@@ -97,12 +97,10 @@ if (isset($_POST['verify_otp'])) {
     </style>
 </head>
 <body>
-    <div id="header">
-        <?php include("header.php"); ?>
-    </div>
-
+    
+<?php include("head1.php"); ?>
     <div id="content">
-        <div class="otp-container">
+        <div class="otp-container bg-info">
             <h2>OTP Verification</h2>
             <form method="post" action="">
            

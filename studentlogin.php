@@ -17,24 +17,35 @@ if (isset($_POST['login'])) {
 
     if (count($error) == 0) {
         // Check if the account is active
-        $sql = "SELECT * FROM students WHERE email='$email' AND password='$password' AND status='Approved'";
+        $sql = "SELECT * FROM students WHERE email='$email' AND password='$password'";
         $result = mysqli_query($conn, $sql);
-        
+    
         if (mysqli_num_rows($result) > 0) {
             $row = mysqli_fetch_array($result);
-            $e = $row['email']; // Get the email from the result
-            
-            // Store the email in the session
-            $_SESSION['student'] = $e;
-            $_SESSION['flash_message'] = "Logged in successfully"; // Flash message
-
-            header("Location: student/index.php");
-            exit(); // Use exit after header redirection
+            $e = $row['email'];
+            $status = $row['status'];
+            $otp_status = $row['otp_status'];
+    
+            if ($otp_status == 0) {
+                $error[] = "Please verify your email first";
+            } else if ($otp_status == 1 && $status == 'pending') {
+                $error[] = "Wait for admin approval";
+            } else if ($status == 'Approved' && $otp_status == 1) {
+                $_SESSION['student'] = $e;
+                $_SESSION['dept'] = $row['department'];
+                $_SESSION['flash_message'] = "Logged in successfully"; // Flash message
+    
+                header("Location: student/index.php");
+                exit(); // Use exit after header redirection
+            }
         } else {
-            $_SESSION['flash_message'] = "Invalid Account or You are not verified"; // Flash message
+            $error[] = "Invalid email or password"; // If no rows returned
         }
-    } else {
-        $_SESSION['flash_message'] = $error['login']; // Flash message
+    }
+    
+    // If there are any errors, store them in the session
+    if (count($error) > 0) {
+        $_SESSION['flash_message'] = implode(', ', $error); // Combine error messages
     }
 }
 ?>
@@ -43,6 +54,7 @@ if (isset($_POST['login'])) {
 <html>
 <head>
     <title>Student Login page</title>
+    <link href="include/jkkniu.png" rel="icon">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -81,8 +93,8 @@ if (isset($_POST['login'])) {
                             </div>
                             <br>
                             <input type="submit" name="login" class="btn btn-success btn-block" value="Sign in">
-                            <p>Don't have an account? <a href="./student/register.php">  Register Here</a></p>
-                            <p><a href="./student/forgot_password.php" class="text-danger"> Forgot Password</a></p>
+                            <p>Don't have an account? <a href="student/register.php">  Register Here</a></p>
+                            <p><a href="student/forgot_password.php" class="text-danger"> Forgot Password</a></p>
                         </form>
                     </div>
                 </div>
@@ -92,5 +104,11 @@ if (isset($_POST['login'])) {
     </div>
 </div>
 <?php include("footer.php"); ?>
+<script>
+      setTimeout(function() {
+        $('#flash-message').fadeOut('slow');
+    }, 5000);
+</script>
+
 </body>
 </html>

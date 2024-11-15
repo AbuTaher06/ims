@@ -17,53 +17,32 @@
     </li> -->
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="improvement_form.php" target="_blank">
-        <i class="bi bi-file-earmark-text"></i>
-        <span>Submit a Request</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="show.php">
-        <i class="bi bi-book"></i>
-        <span>My Submitted Request</span>
-      </a>
-    </li>
-    <!-- <li class="nav-item">
-      <a class="nav-link collapsed" href="seminar.php">
-        <i class="bi bi-file-earmark-text"></i>
-        <span>Seminar</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link collapsed" href="notice.php">
-        <i class="bi bi-card-text"></i>
-        <span>Notice Board</span>
-      </a>
-    </li> -->
-    <!-- <li class="nav-item">
-      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
-        <i class="bi bi-journal-text"></i><span>Others</span><i class="bi bi-chevron-down ms-auto"></i>
-      </a>
-      <ul id="forms-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-        <li>
-          <a href="video.php">
-            <i class="bi bi-circle"></i><span>Videos</span>
-          </a>
-        </li>
-        <li>
-          <a href="gallery.php">
-            <i class="bi bi-circle"></i><span>Gallery</span>
-          </a>
-        </li>
-      </ul>
-    </li> -->
+  <a class="nav-link collapsed" href="request_form.php" target="_blank">
+    <i class="bi bi-pencil-square"></i>
+    <span>Submit a Request</span>
+  </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link collapsed" href="exam_request_show.php">
+    <i class="bi bi-journal-check"></i>
+    <span>My Submitted Request</span>
+  </a>
+</li>
+
+<li class="nav-item">
+  <a class="nav-link collapsed" href="improvement_form.php">
+    <i class="bi bi-arrow-up-circle"></i>
+    <span>Apply for Improvement</span>
+  </a>
+</li>
+
     <li class="nav-item">
       <a class="nav-link collapsed" href="users-profile.php">
         <i class="bi bi-person"></i>
         <span>Profile</span>
       </a>
     </li>
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="pages-faq.php">
         <i class="bi bi-question-circle"></i>
         <span>F.A.Q</span>
@@ -74,7 +53,7 @@
         <i class="bi bi-envelope"></i>
         <span>Contact</span>
       </a>
-    </li>
+    </li> -->
     <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="pages-contact.php">
         <i class="bi bi-envelope"></i>

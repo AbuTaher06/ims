@@ -22,12 +22,12 @@
         <span>Add Admin</span>
       </a>
     </li> -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="add_course.php">
-      <i class="bi bi-pencil-square"></i>
+        <i class="bi bi-book"></i>
         <span>Add Course</span>
       </a>
-    </li>
+    </li> -->
 
     <li class="nav-item">
       <a class="nav-link collapsed" href="users-profile.php">

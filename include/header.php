@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Header Navbar</title>
-    <link href="uploads/jkkniu.png" rel="icon">
+    <title>CIMS</title>
+    <link href="jkkniu.png" rel="icon">
     <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-K2VvTMvLDAU2sa+9vb7/Z1oRS6x3gUq5J5Fytbx8rPU=" crossorigin="anonymous"></script>
@@ -57,6 +57,7 @@
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="./adminLogin.php">Admin</a></li>
                         <li><a class="dropdown-item" href="./deptlogin.php">Department</a></li>
+                        <li><a class="dropdown-item" href="./examcontroller_login.php">Examcontroller</a></li>
                         <li><a class="dropdown-item" href="./studentlogin.php">Student</a></li>
                     </ul>
                 </li>

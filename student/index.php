@@ -33,11 +33,15 @@ include("../include/connect.php");
   <div class="row">
 <?php 
 $email=$_SESSION['student'];
-$pending_sql="select * from imp_form where email='$email' AND status='Pending'";
+$req_sql="select * from students where email='$email'";
+$r=mysqli_query($conn,$req_sql);
+$row=mysqli_fetch_array($r);
+$id=$row['stud_id'];
+$pending_sql="select * from exam_requests where student_id='$id' AND status='Pending'";
 $p=mysqli_query($conn,$pending_sql);
 $t_p=mysqli_num_rows($p);
 
-$accpet_sql="select * from imp_form where email='$email' AND status='Approved'";
+$accpet_sql="select * from exam_requests where student_id='$id' AND status='Approved'";
 $a=mysqli_query($conn,$accpet_sql);
 $t_a=mysqli_num_rows($a);
 
@@ -47,7 +51,7 @@ $t_a=mysqli_num_rows($a);
         <div class="card-body">
           <h5 class="card-title">Pending Request</h5>
           <p class="card-text"><?php echo $t_p; ?></p> <!-- Replace with dynamic count -->
-          <a href="pending_request.php" class="btn btn-primary">View Details</a>
+          <a href="pending_exam.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>
@@ -64,7 +68,7 @@ $t_a=mysqli_num_rows($a);
       <div class="card text-center bg-info">
         <div class="card-body">
           <h5 class="card-title">Total Improvement</h5>
-          <p class="card-text">10</p> <!-- Replace with dynamic count -->
+          <p class="card-text">0</p> <!-- Replace with dynamic count -->
           <a href="improvement.php" class="btn btn-primary">View Details</a>
         </div>
       </div>

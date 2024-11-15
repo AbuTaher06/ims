@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="./include/jkkniu.png" rel="icon">
     <title>IMS Home Page</title>
     <link>
 </head>

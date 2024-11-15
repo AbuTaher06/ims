@@ -31,7 +31,7 @@ include("../include/connect.php");
   </div><!-- End Page Title -->
 
   <div class="row">
-    <div class="col-lg-4 col-md-6 ">
+    <div class="col-lg-6 col-md-6 ">
       <div class="card text-center bg-info">
         <div class="card-body">
           <?php
@@ -45,7 +45,7 @@ include("../include/connect.php");
       </div>
     </div>
 
-    <div class="col-lg-4 col-md-6">
+    <div class="col-lg-6 col-md-6">
       <div class="card text-center  bg-success">
         <div class="card-body">
         <?php
@@ -59,55 +59,7 @@ include("../include/connect.php");
       </div>
     </div>
 
-    <div class="col-lg-4 col-md-6">
-      <div class="card text-center bg-warning">
-        <div class="card-body">
-        <?php
-            $std=mysqli_query($conn,"select * from students where status='Pending'");
-            $t_s=mysqli_num_rows($std);
-            ?>
-          <h5 class="card-title">Total Pending Student</h5>
-          <p class="card-text"><?php echo $T_d; ?></p> <!-- Replace with dynamic count -->
-          <a href="pending_request.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
-  </div><!-- End Dashboard Cards Row -->
-  <div class="row">
-    <div class="col-lg-4 col-md-6 ">
-      <div class="card text-center bg-primary">
-        <div class="card-body">
-          <?php 
-            $std=mysqli_query($conn,"select * from students where status='Approved'");
-            $T_d=mysqli_num_rows($std);
-          ?>
-          <h5 class="card-title">Total Registered Student</h5>
-          <p class="card-text"><?php echo $T_d; ?></p> <!-- Replace with dynamic count -->
-          <a href="registered_student.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
 
-    <div class="col-lg-4 col-md-6">
-      <div class="card text-center  bg-warning">
-        <div class="card-body">
-          <h5 class="card-title">Total Improvement</h5>
-          <p class="card-text">7</p> <!-- Replace with dynamic count -->
-          <a href="improvement.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-4 col-md-6">
-      <div class="card text-center bg-danger">
-        <div class="card-body">
-          <h5 class="card-title">Total Pending Improvement</h5>
-          <p class="card-text">3</p> <!-- Replace with dynamic count -->
-          <a href="pending_request.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
-  </div><!-- End Dashboard Cards Row -->
 
 </main><!-- End #main -->
 

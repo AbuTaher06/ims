@@ -125,15 +125,15 @@
         <h2>Developer Information</h2>
         <div class="developer-info">
             <div class="developer">
-                <img src="images/jannat.jpg" alt="Prof. Dr. Mst. Jannatul Ferdous">
-                <p><strong>Prof. Dr. Mst. Jannatul Ferdous</strong></p>
+                <img src="../asset/images/sujan_sir.jpeg" alt="Sujan Sir">
+                <p><strong>Professor Dr. Md. Sujan Ali</strong></p>
                 <p>Supervisor</p>
                 <p>Dept. of CSE, JKKNIU</p>
-                <p>mjferdous_cse@jkkniu.edu.bd</p>
-                <p>01710695925</p>
+                <p>sujan_cse@jkkniu.edu.bd</p>
+                <p>+88 01919817351</p>
             </div>
             <div class="developer">
-                <img src="images/taher.png" alt="Md Abu Taher">
+                <img src="../asset/images/taher.png" alt="Md Abu Taher">
                 <p><strong>Md Abu Taher</strong></p>
                 <p style="color:blueviolet">PHP Laravel and Vue Js Developer</p>
                 <p>Dept. of CSE, JKKNIU</p>
@@ -142,13 +142,13 @@
                 <p>01645787748</p>
             </div>
             <div class="developer">
-                <img src="images/monir.jpg" alt="Moniruzzaman Monir">
-                <p><strong>Md. Moniruzzaman Monir</strong></p>
+                <img src="../asset/images/default_female.jpg" alt="Suraiya Akhter">
+                <p><strong>Suraiya Akhter</strong></p>
                 <p>Developer</p>
                 <p>Dept. of CSE, JKKNIU</p>
                 <p>Session: 2019-20</p>
-                <p>mmmonir293@gmail.com</p>
-                <p>01997638205</p>
+                <p>sura157iya@gmail.com</p>
+                <p>019********</p>
             </div>
         </div>
     </div>

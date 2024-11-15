@@ -3,8 +3,8 @@ if (session_status() == PHP_SESSION_NONE) {
   session_start();
 }
 ob_start();
-if (!isset($_SESSION['dept'])) {
-  header("Location: ../adminlogin.php");
+if (!isset($_SESSION['controller'])) {
+  header("Location: ../examcontroller_login.php");
   ob_end_flush();
   exit(); 
 }
@@ -22,7 +22,7 @@ include("../include/connect.php");
   <meta content="" name="description">
   <meta content="" name="keywords">
   <!-- Favicons -->
-  <link href="uploads/jkkniu.png" rel="icon">
+  <link href="../admin/uploads/jkkniu.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
@@ -71,8 +71,8 @@ include("../include/connect.php");
         </li>
         <li class="nav-item dropdown">
           <?php
-        $username=$_SESSION['dept'];
-          $query = "SELECT * FROM department WHERE username = '$username'";
+        $username=$_SESSION['controller'];
+          $query = "SELECT * FROM controllers WHERE username = '$username'";
           $result = mysqli_query($conn, $query);
           $num = mysqli_num_rows($result);
           ?>
@@ -94,12 +94,12 @@ include("../include/connect.php");
       
         <?php
        // $email=$_SESSION['student'];
-        $sql="select * from department where username='$username'";
+        $sql="select * from controllers where username='$username'";
         $result=mysqli_query($conn,$sql);
         $row=mysqli_fetch_assoc($result);
         ?>
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="users-profile.php" data-bs-toggle="dropdown">
-        <img src="uploads/<?php echo $row['profile']; ?>" alt="Profile" class="rounded-circle">
+        <img src="../admin/uploads/<?php echo $row['profile']; ?>" alt="Profile" class="rounded-circle">
 
           <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $username;?></span>
         </a>
@@ -154,4 +154,3 @@ include("../include/connect.php");
 </body>
 
 </html>
->

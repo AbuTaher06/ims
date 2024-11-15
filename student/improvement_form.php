@@ -71,19 +71,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date = isset($_POST['date']) ? $_POST['date'] : '';
 
     // Calculate total credits for Improvement courses
-    $totalImprovementCredits = 0;
+    $courseDetails = json_decode($courseDetailsJson, true);
+
+    // Initialize new credits variable
+    $newCredits = 0;
+
+    // Loop through the course details to calculate the new credits
     foreach ($courseDetails as $course) {
-        if ($course['examType'] === 'Improvement') {
-            $totalImprovementCredits += (float)$course['courseCredit'];
+        $newCredits += (float)$course['courseCredit'];
+    }
+
+    // Fetch existing total credits from the database
+    $sql = "SELECT course_details FROM imp_form WHERE department = ? AND current_semester = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $department, $currentSemester);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Initialize existing credits
+    $existingCredits = 0;
+
+    // Loop through results to sum existing course credits
+    while ($row = $result->fetch_assoc()) {
+        $existingCourses = json_decode($row['course_details'], true);
+        foreach ($existingCourses as $existingCourse) {
+            $existingCredits += (float)$existingCourse['courseCredit'];
         }
     }
 
-    // Check if total Improvement credits exceed 6
-    if ($totalImprovementCredits > 6) {
-        echo "<script>alert('Improvement not allowed: Total Improvement credits exceed 6');</script>";
+    // Calculate total credits
+    $totalCredits = $existingCredits + $newCredits;
+
+    // Check if total credits exceed 6
+    if ($totalCredits > 6) {
+        echo "<script>alert('Not allowed: Total course credits cannot exceed 6 for the selected year.');</script>";
+        exit;
     } else {
-        // Convert course details to JSON for database storage
-        $courseDetailsJson = json_encode($courseDetails);
+        echo "<script>console.log('Total credits: $totalCredits');</script>"; // Debugging line
+    }
+    
 
         // Prepare SQL statement to insert data into the database
         $sql = "INSERT INTO imp_form (
@@ -110,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt->close();
     }
-}
+
 ?>
 <main id="main" class="main">
 <div style="text-align: center;">
@@ -165,6 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="HUMAN RESOURCE MANAGEMENT">Human Resource Management</option>
                     <option value="MANAGEMENT">Management</option>
                     <option value="MARKETING">Marketing</option>
+                    
                 </select>
         </div>
 
@@ -288,48 +315,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- Populate dropdowns with initial values from PHP -->
             <td>
-                <select class="form-select" name="courseDetails[0][courseCode]" required id="courseCodeSelect">
-                    <option value="" disabled selected>Select Course Code</option>
-                    <?php 
-                    $student_info = "SELECT * FROM students WHERE email='$uname'";
-                    $result_info = mysqli_query($conn, $student_info);
-                    $student_row = mysqli_fetch_assoc($result_info);
-                    $dept = $student_row['department'];
+    <select class="form-select" name="courseDetails[0][courseCode]" required id="courseCodeSelect" onchange="updateCourseDetails()">
+        <option value="" disabled selected>Select Course Code</option>
+        <?php 
+        $student_info = "SELECT * FROM students WHERE email='$uname'";
+        $result_info = mysqli_query($conn, $student_info);
+        $student_row = mysqli_fetch_assoc($result_info);
+        $dept = $student_row['department'];
 
-                    $course_info = "SELECT DISTINCT course_code,course_title,course_credit FROM courses WHERE dept_name='$dept'";
-                    $result = mysqli_query($conn, $course_info);
+        $course_info = "SELECT DISTINCT course_code, course_title, course_credit FROM courses WHERE dept_name='$dept'";
+        $result = mysqli_query($conn, $course_info);
 
-                    while ($course_row = mysqli_fetch_assoc($result)) {
-                        $course_code = $course_row['course_code'];
-                        echo '<option value="' . $course_code . '">' . $course_code . '</option>';
-                    }
-                    ?>
-                </select>
-            </td>
-            <td>
-                <select class="form-select" name="courseDetails[0][courseCredit]" required id="courseCreditSelect">
-                    <option value="" disabled selected>Select Course Credit</option>
-                    <?php 
-                    mysqli_data_seek($result, 0); // Reset pointer for re-use
-                    while ($course_row = mysqli_fetch_assoc($result)) {
-                        $course_credit = $course_row['course_credit'];
-                        echo '<option value="' . $course_credit . '">' . $course_credit . '</option>';
-                    }
-                    ?>
-                </select>
-            </td>
-            <td>
-                <select class="form-select" name="courseDetails[0][courseTitle]" required id="courseTitleSelect">
-                    <option value="" disabled selected>Select Course Title</option>
-                    <?php 
-                    mysqli_data_seek($result, 0); // Reset pointer for re-use
-                    while ($course_row = mysqli_fetch_assoc($result)) {
-                        $course_title = $course_row['course_title'];
-                        echo '<option value="' . $course_title . '">' . $course_title . '</option>';
-                    }
-                    ?>
-                </select>
-            </td>
+        while ($course_row = mysqli_fetch_assoc($result)) {
+            $course_code = $course_row['course_code'];
+            $course_title = $course_row['course_title'];
+            $course_credit = $course_row['course_credit'];
+            echo '<option value="' . $course_code . '" data-title="' . $course_title . '" data-credit="' . $course_credit . '">' . $course_code . '</option>';
+        }
+        ?>
+    </select>
+</td>
+<td>
+    <select class="form-select" name="courseDetails[0][courseCredit]" required id="courseCreditSelect">
+        <option value="" disabled selected>Select Course Credit</option>
+        <!-- Options will be populated by JavaScript -->
+    </select>
+</td>
+<td>
+    <select class="form-select" name="courseDetails[0][courseTitle]" required id="courseTitleSelect">
+        <option value="" disabled selected>Select Course Title</option>
+        <!-- Options will be populated by JavaScript -->
+    </select>
+</td>
+
 
             <td><input type="number" step="0.01" class="form-control" name="courseDetails[0][gpaObtained]" required min="0" max="2.99" placeholder="Enter GPA (0.00 - 2.99)"></td>
             <td>
@@ -574,6 +592,30 @@ const courseCodes = <?php
         // Update the content of the paragraph element with the publish date
         publishDateDisplay.textContent = `৪| সংশ্লিষ্ট পরীক্ষার ফলাফল প্রকাশের তারিখ: ${publishDate} / খ্রি:`;
     });
+
+    function updateCourseDetails() {
+    var courseSelect = document.getElementById("courseCodeSelect");
+    var selectedOption = courseSelect.options[courseSelect.selectedIndex];
+    
+    var courseTitleSelect = document.getElementById("courseTitleSelect");
+    var courseCreditSelect = document.getElementById("courseCreditSelect");
+    
+    // Clear previous selections
+    courseTitleSelect.value = "";
+    courseCreditSelect.value = "";
+
+    // Set the title and credit based on the selected course
+    var courseTitle = selectedOption.getAttribute("data-title");
+    var courseCredit = selectedOption.getAttribute("data-credit");
+
+    // Populate the course title and credit selects
+    if (courseTitle) {
+        courseTitleSelect.innerHTML = '<option value="' + courseTitle + '">' + courseTitle + '</option>';
+    }
+    if (courseCredit) {
+        courseCreditSelect.innerHTML = '<option value="' + courseCredit + '">' + courseCredit + '</option>';
+    }
+}
     
 </script>
 </main>

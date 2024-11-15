@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 ob_start();
 
 if (!isset($_SESSION['dept'])) {
-    header("Location: ../adminlogin.php");
+    header("Location: ../deptlogin.php");
     ob_end_flush();
     exit();
 }
