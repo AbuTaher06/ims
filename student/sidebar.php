@@ -9,12 +9,12 @@
     </li>
     <li class="nav-heading">Pages</li>
 
-    <!-- <li class="nav-item">
-      <a class="nav-link collapsed" href="rules.php">
-        <i class="bi bi-file-earmark-text"></i>
-        <span>Rules</span>
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="notice.php">
+        <i class="bi bi-envelope"></i>
+        <span>Notices</span>
       </a>
-    </li> -->
+    </li>
 
     <li class="nav-item">
   <a class="nav-link collapsed" href="request_form.php" target="_blank">

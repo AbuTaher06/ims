@@ -1,117 +1,93 @@
 <?php
 session_start();
-$pageTitle = "Pending";
-include("header.php"); // Include header file
-include("sidebar.php"); // Include sidebar file
+$pageTitle = "Pending Requests";
+include("header.php"); 
+include("sidebar.php"); 
 include("../include/connect.php");
 
-// Fetch data from the 'imp_form' table where status is 'Pending' and course_details is not null
-$student = isset($_SESSION['student']) ? $_SESSION['student'] : '';
-if (empty($student)) {
-    die("No student session data found.");
-}
+$uname = $_SESSION['student'];
+$sql = "SELECT * FROM students WHERE email='$uname'";
+$result = mysqli_query($conn, $sql);
+$row = mysqli_fetch_array($result);
+$dept = $row['department'];
+$student_id = $row['stud_id'];
 
-// Prepare the SQL statement
-$sql = "SELECT * FROM imp_form WHERE email=? AND status='Pending' AND course_details IS NOT NULL";
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, 's', $student);
-mysqli_stmt_execute($stmt);
-$res = mysqli_stmt_get_result($stmt);
+// Fetch all pending requests
+$query = "SELECT * 
+          FROM `exam_requests` 
+          WHERE `student_id` = '$student_id' 
+          AND `department` = '$dept' 
+        --   AND `status` = 'pending' 
+          ORDER BY `request_date` DESC";
 
-// Check for SQL errors
-if (!$res) {
-    die("Error executing query: " . mysqli_error($conn));
-}
+$result = mysqli_query($conn, $query);
 ?>
+
 <main id="main" class="main">
-<div class="container-fluid">
-    <div class="col-md-12">
-        <div class="row">
-            <div class="col-md-10">
-                <h4 class="text-danger text-center my-2">
-                    Your Pending Request
-                    <i class="fas fa-exclamation-circle"></i> <!-- Pending icon -->
-                </h4>
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white text-center">
+                <h2 class="mb-0">Pending Requests for Course Retake </h2>
+            </div>
+            <div class="card-body">
+                <?php if (mysqli_num_rows($result) > 0): ?>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-dark text-center">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Course Code</th>
+                                    <th>Course Title</th>
+                                    <th>Course Credit</th>
+                                    <th>Year</th>
+                                    <th>Semester</th>
+                                    <th>Transcript</th>
+                                    <th>Status</th>
+                                    <th>Request Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
 
-                <div class="card">
-                    <div class="card-body">
-                        <?php
-                        if (mysqli_num_rows($res) == 0) {
-                            echo "<p>No data available</p>";
-                        } else {
-                            echo "
-                            <table class='table table-bordered table-striped'>
-                                <thead class='awesome-header bg-secondary'>
+                                <?php 
+                                $counter=0;
+                                while ($row = mysqli_fetch_assoc($result)): ?>
                                     <tr>
-                                        <th>Serial No</th>
-                                        <th>Year</th>
-                                        <th>Semester</th>
-                                        <th>Course Code</th>
-                                        <th>Credit</th>
-                                        <th>Course Title</th>
-                                        <th>GPA Obtained</th>
-                                        <th>Exam Type</th>
+                                        <td class="text-center"><?php echo ++$counter; ?></td>
+                                        <td><?php echo $row['student_name']; ?></td>
+                                        <td><?php echo $row['department']; ?></td>
+                                        <td class="text-center"><?php echo $row['course_code']; ?></td>
+                                        <td><?php echo $row['course_title']; ?></td>
+                                        <td class="text-center"><?php echo $row['course_credit']; ?></td>
+                                        <td class="text-center"><?php echo $row['year']; ?></td>
+                                        <td class="text-center"><?php echo $row['semester']; ?></td>
+                                        <td class="text-center">
+                                            <?php if (!empty($row['transcript_path'])): ?>
+                                                <a href="<?php echo $row['transcript_path']; ?>" target="_blank" class="btn btn-sm btn-success">
+                                                    View Transcript
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-danger">Not Uploaded</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning text-dark"><?php echo ucfirst($row['status']); ?></span>
+                                        </td>
+                                        <td class="text-center"><?php echo date('d M Y', strtotime($row['request_date'])); ?></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                            ";
-                            $counter = 0;
-                            while ($row = mysqli_fetch_assoc($res)) {
-                                $counter++;
-                                // Decode JSON data
-                                $course_details = json_decode($row['course_details'], true);
-
-                                if (json_last_error() !== JSON_ERROR_NONE) {
-                                    echo "<p>Error decoding JSON: " . json_last_error_msg() . "</p>";
-                                    continue;
-                                }
-
-                                foreach ($course_details as $course) {
-                                    // Check if all fields are present
-                                    if (
-                                        !empty($course['serialNo']) &&
-                                        !empty($course['year']) &&
-                                        !empty($course['semester']) &&
-                                        !empty($course['courseCode']) &&
-                                        !empty($course['courseCredit']) &&
-                                        !empty($course['courseTitle']) &&
-                                        !empty($course['gpaObtained']) &&
-                                        !empty($course['examType'])
-                                    ) {
-                                        $serial_no = $counter;
-                                        $year = htmlspecialchars($course['year']);
-                                        $semester = htmlspecialchars($course['semester']);
-                                        $course_code = htmlspecialchars($course['courseCode']);
-                                        $credit = htmlspecialchars($course['courseCredit']);
-                                        $course_title = htmlspecialchars($course['courseTitle']);
-                                        $gpa = htmlspecialchars($course['gpaObtained']);
-                                        $exam_type = htmlspecialchars($course['examType']);
-
-                                        // Output table row
-                                        echo "
-                                        <tr>
-                                            <td>$serial_no</td>
-                                            <td>$year</td>
-                                            <td>$semester</td>
-                                            <td>$course_code</td>
-                                            <td>$credit</td>
-                                            <td>$course_title</td>
-                                            <td>$gpa</td>
-                                            <td>$exam_type</td>
-                                        </tr>
-                                        ";
-                                    }
-                                }
-                            }
-
-                            echo "</tbody></table>";
-                        }
-                        ?>
+                                <?php endwhile; ?>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                <?php else: ?>
+                    <p class="text-center text-muted">No pending requests found.</p>
+                <?php endif; ?>
             </div>
         </div>
     </div>
-</div>
 </main>
-<?php include("footer.php"); ?>
+
+<?php
+include("footer.php");
+?>

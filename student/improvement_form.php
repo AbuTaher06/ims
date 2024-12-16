@@ -364,15 +364,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </table>
 
 
-        <!-- <div id="error-message" class="text-danger" style="display: none;"></div>  
+        <div id="error-message" class="text-danger" style="display: none;"></div>  
         <input type="hidden" id="selectedYear" name="selectedYear">
             <div class="col-md-6">
-            <div class="mb-3">
-            <label for="photo" class="form-label">ছবি (স্বাক্ষর):</label>
-            <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
-        </div>
+            <div class="form-group">
+                <label for="payment_slip">Add Payment Slip:</label>
+                <input type="file" class="form-control" id="payment_slip" name="payment_slip" accept=".pdf, .jpg, .jpeg, .png" required>
+                <small class="form-text text-muted">Please upload a PDF or image file (JPG, JPEG, PNG).</small>
+                <div id="preview-container" class="mt-3"></div>
+            </div>
 
-            </div> -->
+
+            </div>
 
         <input type="submit" class="btn btn-primary w-100" value="Submit"> <!-- Full width button -->
     </form>
@@ -390,6 +393,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!-- AJAX Script to Submit Form and Generate PDF -->
 <script>
+    document.getElementById('payment_slip').addEventListener('change', function (event) {
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = ''; // Clear any existing preview
+
+        const file = event.target.files[0];
+        if (file) {
+            const fileType = file.type;
+            
+            // Handle image previews
+            if (fileType.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = 'Preview of uploaded image';
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+                previewContainer.appendChild(img);
+            } 
+            // Handle PDF previews
+            else if (fileType === 'application/pdf') {
+                const pdf = document.createElement('embed');
+                pdf.src = URL.createObjectURL(file);
+                pdf.type = 'application/pdf';
+                pdf.width = '100%';
+                pdf.height = '400px';
+                previewContainer.appendChild(pdf);
+            } 
+            // If file type is not supported
+            else {
+                const message = document.createElement('p');
+                message.textContent = 'File preview not available for this format.';
+                message.className = 'text-warning';
+                previewContainer.appendChild(message);
+            }
+        }
+    });
     document.addEventListener('DOMContentLoaded', (event) => {
         // Function to apply GPA validation to all GPA inputs
         function applyGPAValidation() {
