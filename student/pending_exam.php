@@ -36,8 +36,8 @@ $result = mysqli_query($conn, $query);
                             <thead class="table-dark text-center">
                                 <tr>
                                     <th>#</th>
-                                    <th>Name</th>
-                                    <th>Department</th>
+                                    <!-- <th>Name</th>
+                                    <th>Department</th> -->
                                     <th>Course Code</th>
                                     <th>Course Title</th>
                                     <th>Course Credit</th>
@@ -55,8 +55,8 @@ $result = mysqli_query($conn, $query);
                                 while ($row = mysqli_fetch_assoc($result)): ?>
                                     <tr>
                                         <td class="text-center"><?php echo ++$counter; ?></td>
-                                        <td><?php echo $row['student_name']; ?></td>
-                                        <td><?php echo $row['department']; ?></td>
+                                        <!-- <td><?php echo $row['student_name']; ?></td>
+                                        <td><?php echo $row['department']; ?></td> -->
                                         <td class="text-center"><?php echo $row['course_code']; ?></td>
                                         <td><?php echo $row['course_title']; ?></td>
                                         <td class="text-center"><?php echo $row['course_credit']; ?></td>

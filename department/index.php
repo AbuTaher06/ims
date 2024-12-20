@@ -60,22 +60,6 @@ include("../include/connect.php");
 </div>
 
   <div class="row">
-    <!-- Total Students -->
-    <div class="col-lg-4 col-md-6 ">
-      <div class="card text-center bg-info">
-        <div class="card-body">
-          <?php
-          $dept = $_SESSION['dept'];
-          $ad = mysqli_query($conn, "SELECT * FROM students WHERE department='$dept'");
-          $num = mysqli_num_rows($ad);
-          ?>
-          <h5 class="card-title">Total Student</h5>
-          <p class="card-text"><?php echo $num; ?></p> 
-          <a href="student.php" class="btn btn-light">View Details</a>
-        </div>
-      </div>
-    </div>
-
     <!-- Registration Requests -->
     <div class="col-lg-4 col-md-6">
       <div class="card text-center bg-primary">
@@ -92,8 +76,9 @@ include("../include/connect.php");
       </div>
     </div>
 
-    <!-- Exam Participation Requests (Row 1) -->
-    <div class="col-lg-4 col-md-6">
+       
+      <!-- Exam Participation Requests (Row 1) -->
+      <div class="col-lg-4 col-md-6">
       <div class="card text-center bg-secondary">
         <div class="card-body">
           <?php
@@ -106,27 +91,30 @@ include("../include/connect.php");
         </div>
       </div>
     </div>
+<!-- Total Students -->
+<div class="col-lg-4 col-md-6 ">
+      <div class="card text-center bg-info">
+        <div class="card-body">
+          <?php
+          $dept = $_SESSION['dept'];
+          $review_status = mysqli_query($conn, "SELECT * FROM exam_requests WHERE status<>'pending' AND department='$dept'");
+          $num = mysqli_num_rows($review_status);
+        
+          ?>
+          <h5 class="card-title">Status of Review</h5>
+          <p class="card-text"><?php echo $num; ?></p> 
+          <a href="review_status.php" class="btn btn-light">View Details</a>
+        </div>
+      </div>
+    </div>
     
   </div><!-- End Dashboard Cards Row -->
 
   <div class="row">
-    <!-- Total Courses -->
-    <div class="col-lg-4 col-md-6">
-      <div class="card text-center bg-warning">
-        <div class="card-body">
-          <?php
-          $std = mysqli_query($conn, "SELECT * FROM courses WHERE dept_name='$dept'");
-          $t_c = mysqli_num_rows($std);
-          ?>
-          <h5 class="card-title">Total Course</h5>
-          <p class="card-text"><?php echo $t_c; ?></p> 
-          <a href="total_course.php" class="btn btn-primary">View Details</a>
-        </div>
-      </div>
-    </div>
 
-    <!-- Registered Students -->
-    <div class="col-lg-4 col-md-6">
+
+   <!-- Registered Students -->
+   <div class="col-lg-4 col-md-6">
       <div class="card text-center bg-danger">
         <div class="card-body">
           <?php
@@ -136,6 +124,21 @@ include("../include/connect.php");
           <h5 class="card-title">Registered Students</h5>
           <p class="card-text"><?php echo $t_s; ?></p> 
           <a href="student.php" class="btn btn-primary">View Details</a>
+        </div>
+      </div>
+    </div>
+ 
+         <!-- Total Courses -->
+         <div class="col-lg-4 col-md-6">
+      <div class="card text-center bg-warning">
+        <div class="card-body">
+          <?php
+          $std = mysqli_query($conn, "SELECT * FROM courses WHERE dept_name='$dept'");
+          $t_c = mysqli_num_rows($std);
+          ?>
+          <h5 class="card-title">Total Course</h5>
+          <p class="card-text"><?php echo $t_c; ?></p> 
+          <a href="total_course.php" class="btn btn-primary">View Details</a>
         </div>
       </div>
     </div>

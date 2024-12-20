@@ -1,4 +1,5 @@
 <?php
+// ... (existing PHP code above)
 session_start();
 $pageTitle = "Request Form";
 include("header.php"); 
@@ -13,196 +14,146 @@ $dept = $row['department'];
 $name = $row['name'];
 $roll = $row['stud_id'];
 $phone = $row['phone'];
-$dept=$row['department'];
-
-// Fetch courses for the specific department
-$courseQuery = "SELECT course_code, course_title, course_credit FROM courses WHERE dept_name = '$dept'";
-$courseResult = mysqli_query($conn, $courseQuery);
-
-// Insert request into database when form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Get form input values
     $name = $_POST['name'];
     $student_id = $_POST['student_id'];
     $dept = $_POST['department'];
     $session = $_POST['session'];
     $phone = $_POST['phone'];
-    $course_code = $_POST['course_code'];
-    $course_title = $_POST['course_title'];
-    $course_credit = $_POST['course_credit'];
-    $year = $_POST['year'];
-    $semester = $_POST['semester'];
 
-    // Handle file upload
-    if (isset($_FILES['transcript']) && $_FILES['transcript']['error'] == 0) {
-        $targetDir = "transcripts/";
-        $fileName = basename($_FILES['transcript']['name']);
-        $targetFilePath = $targetDir . $fileName;
+    $courseData = $_POST['courses'];
+    $uploadErrors = [];
 
-        // Get file extension
-        $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
+    foreach ($courseData as $index => $course) {
+        $courseTitle = $course['course_title'];
+        $courseCode = $course['course_code'];
+        $courseCredit = $course['course_credit'];
+        $courseYear = $course['year'];
+        $courseSemester = $course['semester'];
 
-        // Allowed file types
-        $allowedTypes = ['pdf', 'jpg', 'jpeg', 'png'];
+        if (isset($_FILES['transcripts']['name'][$index]) && $_FILES['transcripts']['error'][$index] == 0) {
+            $targetDir = "transcripts/";
+            $fileName = basename($_FILES['transcripts']['name'][$index]);
+            $targetFilePath = $targetDir . $fileName;
+            $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
 
-        // Validate file type
-        if (in_array($fileType, $allowedTypes)) {
-            // Move the uploaded file to the target directory
-            if (move_uploaded_file($_FILES['transcript']['tmp_name'], $targetFilePath)) {
-                $transcriptPath = $targetFilePath; // File successfully uploaded
+            $allowedTypes = ['pdf', 'jpg', 'jpeg', 'png'];
+            if (in_array($fileType, $allowedTypes)) {
+                if (move_uploaded_file($_FILES['transcripts']['tmp_name'][$index], $targetFilePath)) {
+                    $transcriptPath = $targetFilePath;
+
+                    $query = "INSERT INTO exam_requests 
+                              (student_name, department, student_id, session, phone, course_code, course_title, course_credit, year, semester, transcript_path, status, request_date) 
+                              VALUES 
+                              ('$name', '$dept', '$student_id', '$session', '$phone', '$courseCode', '$courseTitle', '$courseCredit', '$courseYear', '$courseSemester', '$transcriptPath', 'pending', NOW())";
+
+                    if (!mysqli_query($conn, $query)) {
+                        $uploadErrors[] = "Error saving course $courseCode: " . mysqli_error($conn);
+                    }
+                } else {
+                    $uploadErrors[] = "Failed to upload file for course $courseCode.";
+                }
             } else {
-                $_SESSION['flash_message'] = "File upload failed.";
-                header("Location: " . $_SERVER['PHP_SELF']);
-                exit();
+                $uploadErrors[] = "Invalid file type for course $courseCode.";
             }
         } else {
-            $_SESSION['flash_message'] = "Invalid file type. Only PDF, JPG, JPEG, and PNG files are allowed.";
-            header("Location: " . $_SERVER['PHP_SELF']);
-            exit();
+            $uploadErrors[] = "No valid transcript uploaded for course $courseCode.";
         }
-    } else {
-        $_SESSION['flash_message'] = "Please upload a valid transcript.";
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
     }
 
-    // Insert request data into exam_requests table
-    $query = "INSERT INTO exam_requests 
-              (student_name, department, student_id, session, phone, course_code, course_title, course_credit, year, semester, transcript_path, status, request_date) 
-              VALUES 
-              ('$name', '$dept', '$student_id', '$session', '$phone', '$course_code', '$course_title', '$course_credit', '$year', '$semester', '$transcriptPath', 'pending', NOW())";
-
-    if (mysqli_query($conn, $query)) {
-        // Set flash message for success
-        $_SESSION['flash_message'] = "Your request has been submitted successfully!";
+    if (empty($uploadErrors)) {
+        $_SESSION['flash_message'] = "All courses submitted successfully!";
     } else {
-        $_SESSION['flash_message'] = "Error: " . mysqli_error($conn);
+        $_SESSION['flash_message'] = implode("<br>", $uploadErrors);
     }
 
-    // Redirect to the same page to avoid form resubmission
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
 
-
-
-// Display flash message if set
-$flash_message = isset($_SESSION['flash_message']) ? $_SESSION['flash_message'] : '';
-unset($_SESSION['flash_message']); // Clear flash message after displaying
+// ... (existing PHP code continues)
 ?>
-<style>
-    label {
-        font-weight: bold; /* Makes all labels bold */
-    }
-</style>
+<!-- Include Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <main id="main" class="main" style="background-color: #f8f9fa; padding: 50px 0;">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <!-- Card with shadow -->
                 <div class="card shadow-lg">
-                    <!-- Card Header with background and text -->
                     <div class="card-header text-center bg-primary text-white">
-                        <h2 class="mb-0">Submit Course Retake Request</h2>
-                        <p class="mt-1 small">Please fill in the details carefully</p>
+                        <h2 class="mb-0">Submit Course Retake Requests</h2>
+                        <p>Please fill in the details carefully</p>
                     </div>
                     <div class="card-body bg-light">
-                        <!-- Display flash message if it exists -->
-                        <?php if ($flash_message): ?>
-                            <div class='alert alert-success' role='alert' id='flash-message'>
-                                <?php echo $flash_message; ?>
-                            </div>
-                        <?php endif; ?>
-
-                        <!-- Form -->
-                        <form method="POST" action="" enctype="multipart/form-data"> <!-- Added enctype for file upload -->
+                        <form method="POST" action="" enctype="multipart/form-data" id="course-form">
+                            <!-- User Information -->
                             <div class="form-group">
                                 <label for="name">Name:</label>
                                 <input type="text" class="form-control" id="name" name="name" value="<?php echo $name; ?>" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="department">Department:</label>
                                 <input type="text" class="form-control" id="department" name="department" value="<?php echo $dept; ?>" required>
                             </div>
-
                             <div class="form-group">
                                 <label for="student_id">Student ID:</label>
                                 <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo $roll; ?>" required readonly>
                             </div>
-
                             <div class="form-group">
                                 <label for="session">Current Session:</label>
                                 <select class="form-control" id="session" name="session" required>
                                     <option value="">Select Session</option>
-                                    <?php
-                                    for ($year = 2019; $year <= 2029; $year++) {
+                                    <?php for ($year = 2019; $year <= 2029; $year++) {
                                         $next_year = $year + 1;
                                         echo "<option value='{$year}-{$next_year}'>{$year}-{$next_year}</option>";
-                                    }
-                                    ?>
+                                    } ?>
                                 </select>
                             </div>
-
-                            <div class="form-group">
-                                <label for="phone">Phone Number:</label>
-                                <input type="text" class="form-control" id="phone" name="phone" value="<?php echo $phone; ?>" required>
+                            <!-- Course Container -->
+                            <div id="course-container">
+                                <div class="course-group" id="course-1" style="background-color: #e7f3fe; border-left: 5px solid #2196F3;">
+                                    <h5><i class="fas fa-book"></i> Course 1</h5>
+                                    <div class="form-group">
+                                        <label for="course_title_1">Course Title:</label>
+                                        <input type="text" class="form-control" name="courses[0][course_title]" placeholder="Enter Course Title" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="course_code_1">Course Code:</label>
+                                        <input type="text" class="form-control" name="courses[0][course_code]" placeholder="Enter Course Code" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="course_credit_1">Course Credit:</label>
+                                        <input type="text" class="form-control" name="courses[0][course_credit]" placeholder="Enter Course Credit" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="year_1">Year:</label>
+                                        <select class="form-control" name="courses[0][year]" required>
+                                            <option value="">Select Year</option>
+                                            <option value="1st Year">1st</option>
+                                            <option value="2nd Year">2nd</option>
+                                            <option value="3rd Year">3rd</option>
+                                            <option value="4th Year">4th</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="semester_1">Semester:</label>
+                                        <select class="form-control" name="courses[0][semester]" required>
+                                            <option value="">Select Semester</option>
+                                            <option value="1st">1st</option>
+                                            <option value="2nd">2nd</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transcript_1">Add Transcript:</label>
+                                        <input type="file" class="form-control" name="transcripts[]" accept=".pdf, .jpg, .jpeg, .png" required>
+                                    </div>
+                                    <button type="button" class="btn btn-danger remove-course"><i class="fas fa-trash-alt"></i> Remove</button>
+                                    <hr>
+                                </div>
                             </div>
-
-                            <!-- Course Title Dropdown -->
-                            <div class="form-group">
-                                <label for="course_title">Course Title:</label>
-                                <select class="form-control" id="course_title" name="course_title" required>
-                                    <option value="">Select Course Title</option>
-                                    <?php
-                                    if (mysqli_num_rows($courseResult) > 0) {
-                                        while ($row = mysqli_fetch_assoc($courseResult)) {
-                                            echo "<option value='" . $row['course_title'] . "' data-course-code='" . $row['course_code'] . "' data-course-credit='" . $row['course_credit'] . "'>" . $row['course_title'] . "</option>";
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="course_code">Course Code:</label>
-                                <input type="text" class="form-control" id="course_code" name="course_code" readonly required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="course_credit">Course Credit:</label>
-                                <input type="text" class="form-control" id="course_credit" name="course_credit" readonly required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="year">Year:</label>
-                                <select class="form-control" id="year" name="year" required>
-                                    <option value="">Select Year</option>
-                                    <option value="1st Year">1st</option>
-                                    <option value="2nd Year">2nd</option>
-                                    <option value="3rd Year">3rd</option>
-                                    <option value="4th Year">4th</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="semester">Semester:</label>
-                                <select class="form-control" id="semester" name="semester" required>
-                                    <option value="">Select Semester</option>
-                                    <option value="1st">1st</option>
-                                    <option value="2nd">2nd</option>
-                                </select>
-                            </div>
-
-                            <!-- Add Transcript File Input -->
-                            <div class="form-group">
-                                <label for="transcript">Add Transcript:</label>
-                                <input type="file" class="form-control" id="transcript" name="transcript" accept=".pdf, .jpg, .jpeg, .png" required>
-                                <small class="form-text text-muted">Please upload a PDF or image file (JPG, JPEG, PNG).</small>
-                                <div id="preview-container" class="mt-3"></div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary btn-block">Submit Request</button>
+                            <button type="button" class="btn btn-secondary" id="add-course"><i class="fas fa-plus-circle"></i> Add 1 new Course</button>
+                            <button type="submit" class="btn btn-primary btn-block mt-3" id="submit-btn"><i class="fas fa-paper-plane"></i> Submit Requests</button>
                         </form>
                     </div>
                 </div>
@@ -211,60 +162,86 @@ unset($_SESSION['flash_message']); // Clear flash message after displaying
     </div>
 </main>
 
+<script>
+// Function to add new courses
+document.getElementById('add-course').addEventListener('click', function () {
+    const courseContainer = document.getElementById('course-container');
+    const courseCount = courseContainer.getElementsByClassName('course-group').length;
+    const newCourseIndex = courseCount;
 
-<!-- jQuery and AJAX script to fetch course details -->
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-    // When course_title is changed, fetch course details
-    $('#course_title').change(function() {
-        var selectedOption = $(this).find('option:selected');
-        var course_code = selectedOption.data('course-code');
-        var course_credit = selectedOption.data('course-credit');
+    // Randomly assign a background color and border color
+    const colors = [
+        {bg: '#e7f3fe', border: '#2196F3'},
+        {bg: '#fff3cd', border: '#ffc107'},
+        {bg: '#d4edda', border: '#28a745'},
+        {bg: '#f8d7da', border: '#dc3545'}
+    ];
+    const {bg, border} = colors[newCourseIndex % colors.length];
 
-        $('#course_code').val(course_code); // Set course code
-        $('#course_credit').val(course_credit); // Set course credit
-    });
-
-    // Hide flash message after 5 seconds
-    setTimeout(function() {
-        $('#flash-message').fadeOut('slow');
-    }, 5000);
+    const newCourseGroup = `
+        <div class="course-group" id="course-${newCourseIndex + 1}" style="background-color: ${bg}; border-left: 5px solid ${border};">
+            <h5><i class="fas fa-book"></i> Course ${newCourseIndex + 1}</h5>
+            <div class="form-group">
+                <label for="course_title_${newCourseIndex}">Course Title:</label>
+                <input type="text" class="form-control" name="courses[${newCourseIndex}][course_title]" placeholder="Enter Course Title" required>
+            </div>
+            <div class="form-group">
+                <label for="course_code_${newCourseIndex}">Course Code:</label>
+                <input type="text" class="form-control" name="courses[${newCourseIndex}][course_code]" placeholder="Enter Course Code" required>
+            </div>
+            <div class="form-group">
+                <label for="course_credit_${newCourseIndex}">Course Credit:</label>
+                <input type="text" class="form-control" name="courses[${newCourseIndex}][course_credit]" placeholder="Enter Course Credit" required>
+            </div>
+            <div class="form-group">
+                <label for="year_${newCourseIndex}">Year:</label>
+                <select class="form-control" name="courses[${newCourseIndex}][year]" required>
+                    <option value="">Select Year</option>
+                    <option value="1st Year">1st</option>
+                    <option value="2nd Year">2nd</option>
+                    <option value="3rd Year">3rd</option>
+                    <option value="4th Year">4th</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="semester_${newCourseIndex}">Semester:</label>
+                <select class="form-control" name="courses[${newCourseIndex}][semester]" required>
+                    <option value="">Select Semester</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transcript_${newCourseIndex}">Add Transcript:</label>
+                <input type="file" class="form-control" name="transcripts[]" accept=".pdf, .jpg, .jpeg, .png" required>
+            </div>
+            <button type="button" class="btn btn-danger remove-course"><i class="fas fa-trash-alt"></i> Remove</button>
+            <hr>
+        </div>`;
+    courseContainer.insertAdjacentHTML('beforeend', newCourseGroup);
+    attachRemoveEvent();
 });
 
-document.getElementById('transcript').addEventListener('change', function (event) {
-        const previewContainer = document.getElementById('preview-container');
-        previewContainer.innerHTML = ''; // Clear any existing preview
-
-        const file = event.target.files[0];
-        if (file) {
-            const fileType = file.type;
-            
-            // Handle image previews
-            if (fileType.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.alt = 'Preview of uploaded image';
-                img.style.maxWidth = '100%';
-                img.style.height = 'auto';
-                previewContainer.appendChild(img);
-            } 
-            // Handle PDF previews
-            else if (fileType === 'application/pdf') {
-                const pdf = document.createElement('embed');
-                pdf.src = URL.createObjectURL(file);
-                pdf.type = 'application/pdf';
-                pdf.width = '100%';
-                pdf.height = '400px';
-                previewContainer.appendChild(pdf);
-            } 
-            // If file type is not supported
-            else {
-                const message = document.createElement('p');
-                message.textContent = 'File preview not available for this format.';
-                message.className = 'text-warning';
-                previewContainer.appendChild(message);
-            }
-        }
+// Function to attach remove button functionality
+function attachRemoveEvent() {
+    const removeButtons = document.querySelectorAll('.remove-course');
+    removeButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+            this.closest('.course-group').remove(); // Remove the corresponding course group
+        });
     });
+}
+
+// Ensure at least one course is added before submission
+document.getElementById('course-form').addEventListener('submit', function (event) {
+    const courseContainer = document.getElementById('course-container');
+    const courses = courseContainer.getElementsByClassName('course-group');
+    if (courses.length < 1) {
+        alert("Please add at least one course before submitting.");
+        event.preventDefault(); // Prevent form submission
+    }
+});
+
+// Attach remove event on page load for the default course
+attachRemoveEvent();
 </script>
