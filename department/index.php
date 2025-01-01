@@ -69,9 +69,9 @@ include("../include/connect.php");
           $tr = mysqli_query($conn, "SELECT * FROM students WHERE department='$dept' AND status='pending'");
           $r = mysqli_num_rows($tr);
           ?>
-          <h5 class="card-title">Registration Request</h5>
-          <p class="card-text"><?php echo $r ?></p> <!-- Replace with dynamic count -->
-          <a href="student_request.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-user-plus"></i> Registration Request</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $r ?></p> <!-- Replace with dynamic count -->
+          <a href="student_request.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -85,9 +85,9 @@ include("../include/connect.php");
           $primary_request = mysqli_query($conn, "SELECT * FROM exam_requests WHERE status='pending' AND department='$dept'");
           $primary_count = mysqli_num_rows($primary_request);
           ?>
-          <h5 class="card-title">Exam Participation Request</h5>
-          <p class="card-text"><?php echo $primary_count; ?></p>
-          <a href="exam_participation_request.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-clipboard-check"></i> Exam Participation Request</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $primary_count; ?></p>
+          <a href="exam_participation_request.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -101,9 +101,9 @@ include("../include/connect.php");
           $num = mysqli_num_rows($review_status);
         
           ?>
-          <h5 class="card-title">Status of Review</h5>
-          <p class="card-text"><?php echo $num; ?></p> 
-          <a href="review_status.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-check-circle"></i> Status of Review</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $num; ?></p> 
+          <a href="review_status.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -121,9 +121,9 @@ include("../include/connect.php");
           $std = mysqli_query($conn, "SELECT * FROM students WHERE department='$dept' AND status='Approved'");
           $t_s = mysqli_num_rows($std);
           ?>
-          <h5 class="card-title">Registered Students</h5>
-          <p class="card-text"><?php echo $t_s; ?></p> 
-          <a href="student.php" class="btn btn-primary">View Details</a>
+          <h5 class="card-title"><i class="fas fa-user-graduate"></i> Registered Students</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $t_s; ?></p> 
+          <a href="student.php" class="btn btn-primary"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -136,9 +136,9 @@ include("../include/connect.php");
           $std = mysqli_query($conn, "SELECT * FROM courses WHERE dept_name='$dept'");
           $t_c = mysqli_num_rows($std);
           ?>
-          <h5 class="card-title">Total Course</h5>
-          <p class="card-text"><?php echo $t_c; ?></p> 
-          <a href="total_course.php" class="btn btn-primary">View Details</a>
+          <h5 class="card-title"><i class="fas fa-book"></i> Total Course</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $t_c; ?></p> 
+          <a href="total_course.php" class="btn btn-primary"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -151,9 +151,9 @@ include("../include/connect.php");
           $selected_for_improvement = mysqli_query($conn, "SELECT * FROM exam_participation_list WHERE status='approved' AND department='$dept'");
           $selected_count = mysqli_num_rows($selected_for_improvement);
           ?>
-          <h5 class="card-title">Selected for Improvement</h5>
-          <p class="card-text"><?php echo $selected_count; ?></p>
-          <a href="selected_for_improvement.php" class="btn btn-primary">View Details</a>
+          <h5 class="card-title"><i class="fas fa-thumbs-up"></i> Selected for Improvement</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $selected_count; ?></p>
+          <a href="selected_for_improvement.php" class="btn btn-primary"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -169,9 +169,9 @@ include("../include/connect.php");
           // $T_d = mysqli_query($conn, "SELECT * FROM exam_requests WHERE status='pending' AND department='$dept'");
           // $improvement_count = mysqli_num_rows($T_d);
           // ?>
-          <h5 class="card-title">Improvement Exam Request</h5>
-          <p class="card-text">0</p> 
-          <a href="pending_request.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-exclamation-circle"></i> Improvement Exam Request</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;">0</p> 
+          <a href="pending_request.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -180,9 +180,9 @@ include("../include/connect.php");
     <div class="col-lg-6 col-md-6">
       <div class="card text-center bg-danger">
         <div class="card-body">
-          <h5 class="card-title">Improvement Results</h5>
-          <p class="card-text">0</p> <!-- Replace with dynamic count -->
-          <a href="improvementg.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-chart-line"></i> Improvement Results</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;">0</p> <!-- Replace with dynamic count -->
+          <a href="improvementg.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -190,7 +190,5 @@ include("../include/connect.php");
   </div><!-- End Exam Request/Selection Cards Row -->
 
 </main><!-- End #main -->
-
-
 
 <?php include("footer.php"); ?>

@@ -241,7 +241,6 @@ document.getElementById('course-form').addEventListener('submit', function (even
         event.preventDefault(); // Prevent form submission
     }
 });
-
 // Attach remove event on page load for the default course
 attachRemoveEvent();
 </script>

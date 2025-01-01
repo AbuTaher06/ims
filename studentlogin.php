@@ -107,7 +107,7 @@ if (isset($_POST['login'])) {
                                 </div>
                             </div>
                             <br>
-                            <input type="submit" name="login" class="btn btn-success btn-block" value="Sign in">
+                            <input type="checkbox" name="remember"> Remember me <input type="submit" name="login" class="btn btn-success btn-block" value="Sign in">
                             <p>Don't have an account? <a href="student/register.php">Register Here</a></p>
                             <p><a href="student/forgot_password.php" class="text-danger">Forgot Password</a></p>
                         </form>

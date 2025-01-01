@@ -67,9 +67,9 @@ include("../include/connect.php");
           $pending_requests = mysqli_query($conn, "SELECT * FROM exam_participation_list WHERE reviewed_by_controller = 0");
           $pending_count = mysqli_num_rows($pending_requests);
           ?>
-          <h5 class="card-title">Pending Exam Requests</h5>
-          <p class="card-text"><?php echo $pending_count; ?></p>
-          <a href="pending.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-hourglass-half"></i> Pending Exam Requests</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $pending_count; ?></p>
+          <a href="pending.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -78,9 +78,9 @@ include("../include/connect.php");
     <div class="col-lg-3 col-md-6">
       <div class="card text-center bg-warning">
         <div class="card-body">
-          <h5 class="card-title">Review Exam Requests</h5>
-          <p class="card-text">Click to Review</p>
-          <a href="review.php" class="btn btn-primary">Go to Review</a>
+          <h5 class="card-title"><i class="fas fa-edit"></i> Review Exam Requests</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;">Click to Review</p>
+          <a href="review.php" class="btn btn-primary"><i class="fas fa-eye"></i> Go to Review</a>
         </div>
       </div>
     </div>
@@ -93,9 +93,9 @@ include("../include/connect.php");
           $approved_requests = mysqli_query($conn, "SELECT * FROM exam_participation_list WHERE reviewed_by_controller = 1 AND status = 'Approved'");
           $approved_count = mysqli_num_rows($approved_requests);
           ?>
-          <h5 class="card-title">Approved Exam Requests</h5>
-          <p class="card-text"><?php echo $approved_count; ?></p>
-          <a href="approved_exam_requests.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-check-circle"></i> Approved Exam Requests</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $approved_count; ?></p>
+          <a href="approved_exam_requests.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>
@@ -108,9 +108,9 @@ include("../include/connect.php");
           $rejected_requests = mysqli_query($conn, "SELECT * FROM exam_participation_list WHERE reviewed_by_controller = 1 AND status = 'Rejected'");
           $rejected_count = mysqli_num_rows($rejected_requests);
           ?>
-          <h5 class="card-title">Rejected Exam Requests</h5>
-          <p class="card-text"><?php echo $rejected_count; ?></p>
-          <a href="rejected_exam_requests.php" class="btn btn-light">View Details</a>
+          <h5 class="card-title"><i class="fas fa-times-circle"></i> Rejected Exam Requests</h5>
+          <p class="card-text" style="font-size: 24px; font-weight: bold;"><?php echo $rejected_count; ?></p>
+          <a href="rejected_exam_requests.php" class="btn btn-light"><i class="fas fa-eye"></i> View Details</a>
         </div>
       </div>
     </div>

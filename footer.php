@@ -116,7 +116,7 @@
 
 <div class="footer mt-4">
     <hr>
-    &copy; <strong><span>© <?php echo date('Y'); ?> Dept of CSE, JKKNIU.</span></strong>. All Rights Reserved | <strong><span></span><a href="#" id="modalLink" style="color: green;">Developed by</a></span></strong>
+    <strong><span>© <?php echo date('Y'); ?> Dept of CSE, JKKNIU.</span></strong>. All Rights Reserved | <strong><span></span><a href="#" id="modalLink" style="color: green;">Developed by</a></span></strong>
 </div>
 
 <div id="myModal" class="modal">

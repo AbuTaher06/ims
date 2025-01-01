@@ -64,33 +64,49 @@ if(count($error)==0){
                     </div>
                     
                     <div class="card mx-auto mt-5" style="max-width: 400px;">
-                        <div class="card-body">
-                            <form method="post" class="my-2">
-                                <div>
-                                    <?php
-                                        if(isset($error["admin"])){
-                                            $sh = $error['admin'];
-                                            $show = "<h4 class='alert alert-danger'>$sh</h4>";
-                                            echo $show;
-                                        } else {
-                                            $show = "";
-                                        }
-                                    ?>
-                                </div>
+                    <div class="card-body">
+    <form method="post" class="my-2">
+        <div>
+            <?php
+                if(isset($error["admin"])){
+                    $sh = $error['admin'];
+                    $show = "<h4 class='alert alert-danger'>$sh</h4>";
+                    echo $show;
+                } else {
+                    $show = "";
+                }
+            ?>
+        </div>
 
-                                <div class="form-group">
-                                    <label for="uname">Username</label>
-                                    <input type="text" name="uname" class="form-control" autocomplete="off" placeholder="Enter Username" value="<?php if(isset($_POST['uname'])) echo $_POST['uname'];?>">
-                                </div>
+        <div class="form-group">
+            <label for="uname">Username</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-user"></i></span>
+                </div>
+                <input type="text" name="uname" class="form-control" autocomplete="off" placeholder="Enter Username" value="<?php if(isset($_POST['uname'])) echo $_POST['uname'];?>">
+            </div>
+        </div>
 
-                                <div class="form-group">
-                                    <label for="pass">Password</label>
-                                    <input type="password" name="pass" class="form-control" placeholder="Enter Password">
-                                </div>
+        <div class="form-group">
+            <label for="pass">Password</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+                <input type="password" id="password" name="pass" class="form-control" placeholder="Enter Password">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i class="fa fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-                                <input type="submit" name="login" class="btn btn-success btn-block" value="Login">
-                            </form>
-                        </div>
+        <input type="submit" name="login" class="btn btn-success btn-block" value="Login">
+    </form>
+</div>
+
                     </div>
 
                 </div>
@@ -105,5 +121,15 @@ if(count($error)==0){
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+    document.getElementById('togglePassword').addEventListener('click', function (e) {
+        const passwordField = document.getElementById('password');
+        const passwordFieldType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordField.setAttribute('type', passwordFieldType);
+
+        // Toggle the icon
+        this.innerHTML = passwordFieldType === 'password' ? '<i class="fa fa-eye"></i>' : '<i class="fa fa-eye-slash"></i>';
+    });
+</script>
 </body>
 </html>
