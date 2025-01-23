@@ -41,10 +41,17 @@ include("../include/connect.php");
                     <?php
                     $dept = $_SESSION['dept'];
 
+                    $dept_sql = "SELECT dept_name FROM department WHERE username='$dept'";
+                    $dept_res = mysqli_query($conn, $dept_sql);
+                    $dept_row = mysqli_fetch_assoc($dept_res);
+                    $dept_name = $dept_row['dept_name'];
+
+
+
                     // Fetch distinct sessions from the database
                     $session_query = "SELECT DISTINCT session FROM students WHERE department=? and status='Approved'";
                     $stmt = $conn->prepare($session_query);
-                    $stmt->bind_param("s", $dept); // bind the department parameter
+                    $stmt->bind_param("s", $dept_name); // bind the department parameter
                     $stmt->execute();
                     $session_result = $stmt->get_result();
                     $sessions = $session_result->fetch_all(MYSQLI_ASSOC);
@@ -78,10 +85,10 @@ include("../include/connect.php");
                     // Prepare the query
                     if (!empty($selected_session)) {
                         $stmt = $conn->prepare($query);
-                        $stmt->bind_param("ss", $dept, $selected_session); // Bind both department and session
+                        $stmt->bind_param("ss", $dept_name, $selected_session); // Bind both department and session
                     } else {
                         $stmt = $conn->prepare($query);
-                        $stmt->bind_param("s", $dept); // Bind only department
+                        $stmt->bind_param("s", $dept_name); // Bind only department
                     }
 
                     $stmt->execute();

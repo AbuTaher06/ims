@@ -19,22 +19,22 @@
     <li class="nav-item">
   <a class="nav-link collapsed" href="request_form.php" target="_blank">
     <i class="bi bi-pencil-square"></i>
-    <span>Submit a Request</span>
+    <span>Apply for Improvement</span>
   </a>
 </li>
 <li class="nav-item">
   <a class="nav-link collapsed" href="exam_request_show.php">
     <i class="bi bi-journal-check"></i>
-    <span>My Submitted Request</span>
+    <span>My Submitted Application</span>
   </a>
 </li>
 
-<li class="nav-item">
+<!-- <li class="nav-item">
   <a class="nav-link collapsed" href="improvement_form.php">
     <i class="bi bi-arrow-up-circle"></i>
     <span>Apply for Improvement</span>
   </a>
-</li>
+</li> -->
 
     <li class="nav-item">
       <a class="nav-link collapsed" href="users-profile.php">

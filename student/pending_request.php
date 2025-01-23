@@ -17,7 +17,8 @@ $query = "SELECT *
           FROM `exam_requests` 
           WHERE `student_id` = '$student_id' 
           AND `department` = '$dept' 
-        --   AND `status` = 'pending' 
+        --   AND `status` = 'pending'
+          AND `sent_from_department` = 'pending' 
           ORDER BY `request_date` DESC";
 
 $result = mysqli_query($conn, $query);

@@ -13,7 +13,7 @@ if (!isset($_GET['id'])) {
 $id = $_GET['id'];
 
 // Fetch the specific exam participation request
-$request_query = "SELECT * FROM `exam_participation_list` WHERE id='$id'";
+$request_query = "SELECT * FROM `exam_requests` WHERE id='$id'";
 $request_result = mysqli_query($conn, $request_query);
 
 if (mysqli_num_rows($request_result) == 0) {
@@ -24,21 +24,21 @@ if (mysqli_num_rows($request_result) == 0) {
 $request_data = mysqli_fetch_assoc($request_result);
 
 if (isset($_POST['approve'])) {
-    // Update the request to approved
-    $update_query = "UPDATE `exam_participation_list` 
-                     SET reviewed_by_controller = 1, status = 'Approved' 
+    // Update the request to sent
+    $update_query = "UPDATE `exam_requests` 
+                     SET reviewed_by_controller = 1, sent_to_department = 'sent' 
                      WHERE id='$id'";
     mysqli_query($conn, $update_query);
 
-    $_SESSION['success'] = "Request approved successfully.";
+    $_SESSION['success'] = "Request sent successfully.";
     header("Location: pending.php"); // Redirect back to pending lists
     exit();
 }
 
 if (isset($_POST['reject'])) {
     // Update the request to rejected
-    $update_query = "UPDATE `exam_participation_list` 
-                     SET reviewed_by_controller = 1, status = 'Rejected' 
+    $update_query = "UPDATE `exam_requests` 
+                     SET reviewed_by_controller = 1, sent_to_department = 'rejected' 
                      WHERE id='$id'";
     mysqli_query($conn, $update_query);
 

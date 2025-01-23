@@ -126,7 +126,7 @@ if (isset($_POST['update_profile'])) {
         <h1>My Profile</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                 <li class="breadcrumb-item">students</li>
                 <li class="breadcrumb-item active">Profile</li>
             </ol>

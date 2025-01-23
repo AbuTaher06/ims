@@ -110,7 +110,7 @@
                 Login
             </a>
             <ul class="dropdown-menu custom-dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item custom-dropdown-item" href="./adminLogin.php">Admin</a></li>
+                <li><a class="dropdown-item custom-dropdown-item" href="./adminLogin.php">Super Admin</a></li>
                 <li><a class="dropdown-item custom-dropdown-item" href="./deptlogin.php">Department</a></li>
                 <li><a class="dropdown-item custom-dropdown-item" href="./examcontroller_login.php">Exam Controller</a></li>
                 <li><a class="dropdown-item custom-dropdown-item" href="./studentlogin.php">Student</a></li>

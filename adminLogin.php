@@ -60,7 +60,7 @@ if(count($error)==0){
                 <div class="jumbotron shadow">
                     <div class="text-center">
                         <!-- <img src="images/admin.jpeg" class="img-fluid" alt="Admin Image"> -->
-                        <h3>Admin Login</h3>
+                        <h3>Super Admin Login</h3>
                     </div>
                     
                     <div class="card mx-auto mt-5" style="max-width: 400px;">

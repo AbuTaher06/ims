@@ -9,8 +9,7 @@ use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
 if(isset($_POST['create'])){
-    $firstname = $_POST['firstname'];
-    $username = $_POST['uname'];
+    $name = $_POST['name'];
     $dept = isset($_POST['dept']) ? $_POST['dept'] : "";  // Make sure department is set correctly
     $stud_id = $_POST['stud_id'];
     $reg_no = $_POST['reg_no'];
@@ -32,30 +31,34 @@ if(isset($_POST['create'])){
 
     $error = array();
 
-    // Validate firstname
-    if(empty($firstname)){
-        $error['firstname'] = "Enter Firstname";
+    // Validate Name
+    if (empty($name)) {
+        $error['name'] = "Enter Username";
+    } elseif (!preg_match("/^[a-zA-Z\s.]+$/", $name)) {
+        $error['name'] = "Name should contain only letters, spaces, and dots.";
     }
-
-    // Validate username
-    if(empty($username)){
-        $error['username'] = "Enter Username";
-    }
+    
+    
 
     // Validate department
     if(empty($dept)){
         $error['dept'] = "Select a Department";
     }
 
-    // Validate student ID
-    if(empty($stud_id)){
-        $error['stud_id'] = "Enter Student ID";
-    }
+    // Validate student ID (exactly 9 digits)
+        if (empty($stud_id)) {
+            $error['stud_id'] = "Enter Student ID";
+        } elseif (!preg_match("/^\d{0,9}$/", $stud_id)) {
+            $error['stud_id'] = "Student ID must be digit and not more than 9 digits.";
+        }
 
-    // Validate registration number
-    if(empty($reg_no)){
-        $error['reg_no'] = "Enter Registration Number";
-    }
+        // Validate registration number (exactly 5 digits)
+        if (empty($reg_no)) {
+            $error['reg_no'] = "Enter Registration Number";
+        } elseif (!preg_match("/^\d{0,5}$/", $reg_no)) {
+            $error['reg_no'] = "Registration Number must be digit and not more than 5 digits.";
+        }
+
 
     // Validate email
     $sq = "SELECT * FROM students WHERE email = '$email'";
@@ -88,8 +91,7 @@ if(isset($_POST['create'])){
     // Validate password
     function validatePassword($password) {
         // Minimum length requirement
-        $minLength = 8;
-
+        $minLength = 4;
         // Check if the password meets the minimum length requirement
         if (strlen($password) < $minLength) {
             return false;
@@ -124,7 +126,7 @@ if(isset($_POST['create'])){
     } elseif ($password != $confirm_password) {
         $error['pass'] = "Passwords do not match";
     } elseif (!validatePassword($password)) {
-        $error['pass'] = "Password does not meet the criteria.";
+        $error['pass'] = "Password must be at least 6 characters long and include at least one lowercase letter, one uppercase letter, one digit, and one special character.";
     }
 
     // Validate session
@@ -166,8 +168,8 @@ if(isset($_POST['create'])){
     // If there are no errors, proceed with database insertion
     if(empty($error)){
         // Save the OTP directly in the students table
-        $sql = "INSERT INTO students(name, username, department, stud_id, reg_no, email, gender, phone, password, data_reg, status, session, profile, otp) 
-                VALUES('$firstname','$username','$dept','$stud_id','$reg_no','$email','$gender','$phone','$password', NOW(), 'pending', '$session', '$profile', '$otp')";
+        $sql = "INSERT INTO students(name, department, stud_id, reg_no, email, gender, phone, password, data_reg, status, session, profile, otp) 
+                VALUES('$name','$dept','$stud_id','$reg_no','$email','$gender','$phone','$password', NOW(), 'pending', '$session', '$profile', '$otp')";
 
         if (mysqli_query($conn, $sql)) {
             // Send the OTP via email using PHPMailer
@@ -202,8 +204,6 @@ if(isset($_POST['create'])){
 }
 ?>
 
-
-<!DOCTYPE html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -219,149 +219,182 @@ if(isset($_POST['create'])){
             background-size: cover;
         }
         .header-caption {
-            background-color: #007bff; /* Bootstrap primary color */
+            background-color: #007bff;
             color: white;
             padding: 15px;
             text-align: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 30px;
             border-radius: 5px;
         }
         .card {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
-        .form-group {
-            margin-bottom: 15px; /* Increased margin for better spacing */
+        label {
+            font-weight: bold;
         }
         .btn {
-            margin-top: 15px; /* Added margin for button */
-        }
-        .text-danger {
-            font-size: 0.9rem; /* Slightly smaller error message font */
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-<?php include("head1.php"); ?>
+    <?php include("head1.php"); ?>
     <div class="container">
-       
-        <div class="row justify-content-center mt-2">
-            <div class="col-md-8 col-lg-7">
-                <div class="card bg-accent">
-                    <div class="card-body bg-info">
-                        <h5 class="card-title text-center">Create Account</h5>
-                        <form method="post" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label>Firstname</label>
-                                <input type="text" name="firstname" class="form-control" autocomplete="off" placeholder="Enter Firstname" value="<?php if(isset($_POST['firstname'])) echo $_POST['firstname'];?>">
-                                <?php if(isset($error['firstname'])) echo "<p class='text-danger'>".$error['firstname']."</p>"; ?>
-                            </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card mt-5 p-4">
+                    <div class="header-caption">
+                        Create Account
+                    </div>
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter Username" value="<?php if(isset($_POST['name'])) echo $_POST['name']; ?>">
+                            <?php if(isset($error['name'])) echo "<small class='text-danger'>".$error['name']."</small>"; ?>
+                        </div>
 
-                            <div class="form-group">
-                                <label>Username</label>
-                                <input type="text" name="uname" class="form-control" autocomplete="off" placeholder="Enter Username" value="<?php if(isset($_POST['uname'])) echo $_POST['uname'];?>">
-                                <?php if(isset($error['username'])) echo "<p class='text-danger'>".$error['username']."</p>"; ?>
-                            </div>
-
-                            <div class="form-group"> 
- 
+                        <div class="form-group">
+                            <label for="department">Department</label>
                             <select name="dept" id="department" class="form-control">
-                            <option value="">Select Department</option>
-                            <?php
-                            $query = "SELECT * FROM department"; 
-                            $result = mysqli_query($conn, $query);
-                            if ($result) {
-                                while ($row = mysqli_fetch_assoc($result)) {
-                                    ?>
-                                    <option value="<?php echo $row['dept_name']; ?>"> <!-- Make sure 'Id' is capitalized correctly -->
-                                        <?php echo $row['dept_name']; ?>
-                                    </option>
-                                    <?php
+                                <option value="">Select Department</option>
+                                <?php
+                                $query = "SELECT * FROM department";
+                                $result = mysqli_query($conn, $query);
+                                if ($result) {
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo "<option value='{$row['dept_name']}'>{$row['dept_name']}</option>";
+                                    }
                                 }
-                            }
-                            ?>
-                        </select>
-               
-                         </div>
-                            <div class="form-group">
-                                <label>Student ID</label>
-                                <input type="text" name="stud_id" class="form-control" autocomplete="off" placeholder="Enter Student ID" value="<?php if(isset($_POST['stud_id'])) echo $_POST['stud_id'];?>">
-                                <?php if(isset($error['stud_id'])) echo "<p class='text-danger'>".$error['stud_id']."</p>"; ?>
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="stud_id">Student ID</label>
+                            <input type="text" name="stud_id" id="stud_id" class="form-control" placeholder="Enter Student ID" value="<?php if(isset($_POST['stud_id'])) echo $_POST['stud_id']; ?>">
+                            <?php if(isset($error['stud_id'])) echo "<small class='text-danger'>".$error['stud_id']."</small>"; ?>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reg_no">Reg No.</label>
+                            <input type="text" name="reg_no" id="reg_no" class="form-control" placeholder="Enter Registration Number" value="<?php if(isset($_POST['reg_no'])) echo $_POST['reg_no']; ?>">
+                            <?php if(isset($error['reg_no'])) echo "<small class='text-danger'>".$error['reg_no']."</small>"; ?>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="session">Current Session</label>
+                            <select name="session" id="session" class="form-control">
+                                <option value="">Select Session</option>
+                                <?php for ($year = 2019; $year <= 2029; $year++): ?>
+                                    <?php $next_year = $year + 1; ?>
+                                    <option value="<?php echo "{$year}-{$next_year}"; ?>"><?php echo "{$year}-{$next_year}"; ?></option>
+                                <?php endfor; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" id="email" class="form-control" placeholder="Enter Your Email" value="<?php if(isset($_POST['email'])) echo $_POST['email']; ?>">
+                            <?php if(isset($error['email'])) echo "<small class='text-danger'>".$error['email']."</small>"; ?>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="text" name="phone" id="phone" class="form-control" placeholder="Enter Your Phone" value="<?php if(isset($_POST['phone'])) echo $_POST['phone']; ?>">
+                            <?php if(isset($error['phone'])) echo "<small class='text-danger'>".$error['phone']."</small>"; ?>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Gender</label><br>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="gender" value="Male" class="form-check-input" id="genderMale">
+                                <label class="form-check-label" for="genderMale">Male</label>
                             </div>
-
-                            <div class="form-group">
-                                <label>Reg No.</label>
-                                <input type="text" name="reg_no" class="form-control" autocomplete="off" placeholder="Enter Your Reg. No ID" value="<?php if(isset($_POST['reg_no'])) echo $_POST['reg_no'];?>">
-                                <?php if(isset($error['reg_no'])) echo "<p class='text-danger'>".$error['reg_no']."</p>"; ?>
+                            <div class="form-check form-check-inline">
+                                <input type="radio" name="gender" value="Female" class="form-check-input" id="genderFemale">
+                                <label class="form-check-label" for="genderFemale">Female</label>
                             </div>
+                            <?php if(isset($error['gender'])) echo "<small class='text-danger'>".$error['gender']."</small>"; ?>
+                        </div>
 
-                            <div class="form-group">
-                        <label for="session">Current Session:</label>
-                        <select class="form-control" id="session" name="session" required>
-                            <option value="">Select Session</option>
-                            <?php
-                            for ($year = 2019; $year <= 2029; $year++) {
-                                $next_year = $year + 1;
-                                echo "<option value='{$year}-{$next_year}'>{$year}-{$next_year}</option>";
-                            }
-                            ?>
-                        </select>
-                        <?php if(isset($error['session'])) echo "<p class='text-danger'>".$error['session']."</p>"; ?>
-                    </div>
+                        <div class="form-group">
+    <label for="pass">Password</label>
+    <div class="input-group">
+        <input type="password" name="pass" id="pass" class="form-control" placeholder="Enter Password">
+        <div class="input-group-append">
+            <span class="input-group-text" id="togglePass" style="cursor: pointer;">
+                <i class="fas fa-eye"></i>
+            </span>
+        </div>
+    </div>
+    <?php if(isset($error['pass'])) echo "<small class='text-danger'>".$error['pass']."</small>"; ?>
+</div>
 
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="text" name="email" class="form-control" autocomplete="off" placeholder="Enter Your Email" value="<?php if(isset($_POST['email'])) echo $_POST['email'];?>">
-                                <?php if(isset($error['email'])) echo "<p class='text-danger'>".$error['email']."</p>"; ?>
-                            </div>
+<div class="form-group">
+    <label for="con_pass">Confirm Password</label>
+    <div class="input-group">
+        <input type="password" name="con_pass" id="con_pass" class="form-control" placeholder="Confirm Password">
+        <div class="input-group-append">
+            <span class="input-group-text" id="toggleConPass" style="cursor: pointer;">
+                <i class="fas fa-eye"></i>
+            </span>
+        </div>
+    </div>
+    <?php if(isset($error['con_pass'])) echo "<small class='text-danger'>".$error['con_pass']."</small>"; ?>
+</div>
 
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <input type="text" name="phone" class="form-control" autocomplete="off" placeholder="Enter Your Phone" value="<?php if(isset($_POST['phone'])) echo $_POST['phone'];?>">
-                                <?php if(isset($error['phone'])) echo "<p class='text-danger'>".$error['phone']."</p>"; ?>
-                            </div>
+                        <div class="form-group">
+                            <label for="profile">Profile Picture</label>
+                            <input type="file" name="profile" id="profile" class="form-control-file">
+                            <?php if(isset($error['profile'])) echo "<small class='text-danger'>".$error['profile']."</small>"; ?>
+                        </div>
 
-                            <div class="form-group">
-                                <label>Gender</label><br>
-                                <input type="radio" name="gender" value="Male"> Male
-                                <input type="radio" name="gender" value="Female"> Female
-                                <?php if(isset($error['gender'])) echo "<p class='text-danger'>".$error['gender']."</p>"; ?>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Password</label>
-                                <input type="password" name="pass" class="form-control" autocomplete="off" placeholder="Enter Password">
-                                <?php if(isset($error['pass'])) echo "<p class='text-danger'>".$error['pass']."</p>"; ?>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Confirm Password</label>
-                                <input type="password" name="con_pass" class="form-control" autocomplete="off" placeholder="Confirm your password">
-                                <?php if(isset($error['con_pass'])) echo "<p class='text-danger'>".$error['con_pass']."</p>"; ?>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Profile Picture</label>
-                                <input type="file" name="profile" class="form-control-file">
-                                <?php if(isset($error['profile'])) echo "<p class='text-danger'>".$error['profile']."</p>"; ?>
-                            </div>
-
-                            <input type="submit" name="create" value="Register" class="btn btn-success btn-block">
-                            <p class="text-center mt-3 ">Already have an Account? <a href="../studentLogin.php" class="text-danger">Click Here</a></p>
-                        </form>
-                    </div>
+                        <button type="submit" name="create" class="btn btn-success btn-block">Register</button>
+                        <p class="text-center mt-3">Already have an account? <a href="../studentLogin.php" class="text-danger">Click Here</a></p>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <?php include("footer.php"); ?>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- FontAwesome for Eye Icon -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script>
+    document.getElementById('togglePass').addEventListener('click', function () {
+        let passField = document.getElementById('pass');
+        let icon = this.querySelector('i');
+        if (passField.type === 'password') {
+            passField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+
+    document.getElementById('toggleConPass').addEventListener('click', function () {
+        let conPassField = document.getElementById('con_pass');
+        let icon = this.querySelector('i');
+        if (conPassField.type === 'password') {
+            conPassField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            conPassField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+</script>
+
+<?php include("footer.php"); ?>
 </body>
 </html>
+
 
 
 

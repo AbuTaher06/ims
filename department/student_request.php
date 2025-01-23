@@ -56,7 +56,13 @@ include("sidebar.php");
 
 <?php
 $dept = $_SESSION['dept'];
-$sql = "SELECT * FROM students WHERE status='Pending' AND department='$dept' ORDER BY data_reg ASC";
+
+$dept_sql="SELECT dept_name FROM department WHERE username='$dept'";
+$dept_res=mysqli_query($conn,$dept_sql);
+$dept_row=mysqli_fetch_assoc($dept_res);
+$dept_name=$dept_row['dept_name'];
+
+$sql = "SELECT * FROM students WHERE status='Pending' AND department='$dept_name' ORDER BY data_reg ASC";
 $res = mysqli_query($conn, $sql);
 
 $output = "

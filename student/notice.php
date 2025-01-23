@@ -51,10 +51,15 @@ if (!$notices_result) {
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header">
-                    <h5>Notices Sent to You</h5>
-                    <button class="btn btn-danger float-right" onclick="downloadPDF()"><i class="fas fa-download"></i> Download as PDF</button>
-                </div>
+            <div class="card-header">
+                <h5>Notices Sent to You</h5>
+                <a href="view_notices.php" class="btn btn-primary float-right ml-2">
+                    <i class="fas fa-eye"></i> Show Notices
+                </a>
+
+                <button class="btn btn-danger float-right" onclick="downloadPDF()"><i class="fas fa-download"></i> Download as PDF</button>
+            </div>
+
                 <div class="card-body">
                     <!-- Student Info -->
                     <div class="mb-3 text-center">
@@ -105,32 +110,62 @@ if (!$notices_result) {
 <?php include("footer.php"); ?>
 
 <script>
-function downloadPDF() {
+    function downloadPDF() {
     var { jsPDF } = window.jspdf;
     var doc = new jsPDF();
     var elementHTML = document.getElementById('notice-table');
 
-    html2canvas(elementHTML).then(function(canvas) {
-        var imgData = canvas.toDataURL('image/png');
-        var imgWidth = 210; 
-        var pageHeight = 295;  
-        var imgHeight = canvas.height * imgWidth / canvas.width;
-        var heightLeft = imgHeight;
-        var position = 0;
+    // Add student info
+    var studentName = '<?php echo $student["name"]; ?>';
+    var studentRollNo = '<?php echo $student["stud_id"]; ?>';
+    var studentDepartment = '<?php echo $student["department"]; ?>';
 
-        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+    // Add margins and padding
+    var margin = 10;
+    var padding = 10;
+    var pageWidth = doc.internal.pageSize.getWidth() - 2 * margin;
+    var pageHeight = doc.internal.pageSize.getHeight() - 2 * margin;
 
-        while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            doc.addPage();
-            doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    // Add logo
+    var logo = new Image();
+    logo.src = 'jkkniu.png'; // Replace with the actual path to your logo
+    logo.onload = function() {
+        doc.addImage(logo, 'PNG', pageWidth / 2 - 15, margin, 30, 30);
+
+        // Add student info to PDF
+        var y = margin + 40; // Adjust y position after the logo
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 128); // Add color (dark blue)
+        doc.text(pageWidth / 2, y += padding, 'Student Information', { align: 'center' });
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0); // Black color for details
+        doc.text(pageWidth / 2, y += padding + 5, 'Name: ' + studentName, { align: 'center' });
+        doc.text(pageWidth / 2, y += padding + 5, 'Roll No: ' + studentRollNo, { align: 'center' });
+        doc.text(pageWidth / 2, y += padding + 5, 'Department: ' + studentDepartment, { align: 'center' });
+
+        // Convert HTML to canvas and add it to the PDF
+        html2canvas(elementHTML).then(function (canvas) {
+            var imgData = canvas.toDataURL('image/png');
+            var imgWidth = pageWidth;
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+            var heightLeft = imgHeight;
+            var position = y + 20; // Adjust position for content
+
+            doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
             heightLeft -= pageHeight;
-        }
 
-        doc.save('notices.pdf');
-    }).catch(function(error) {
-        console.error("Error generating PDF: ", error);
-    });
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight + position;
+                doc.addPage();
+                doc.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            doc.save('notices.pdf');
+        }).catch(function (error) {
+            console.error("Error generating PDF: ", error);
+        });
+    };
 }
+
 </script>

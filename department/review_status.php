@@ -22,9 +22,9 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
 $semester = isset($_GET['semester']) ? $_GET['semester'] : '';
 
 // Fetch exam participation requests for the logged department with optional filters
-$exam_requests_query = "SELECT `id`, `student_name`, `student_id`, `session`, `phone`, `course_code`, `course_title`, `course_credit`, `year`, `semester`, `status`, `request_date`
+$exam_requests_query = "SELECT *
                         FROM `exam_requests`
-                        WHERE department='$dept' AND status <> 'pending'";
+                        WHERE department='$dept' AND reviewed_by_controller = 1 AND sent_to_department <> 'pending'";
 
 // Apply filters
 if (!empty($year)) {
@@ -50,8 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
     if (count($selected_ids) > 0) {
         foreach ($selected_ids as $id) {
             // Fetch the row from exam_requests using the selected ID
-            $request_query = "SELECT `student_name`, `student_id`, `session`, `phone`, `course_code`, 
-                                     `course_title`, `course_credit`, `year`, `semester`, `request_date` 
+            $request_query = "SELECT *
                               FROM `exam_requests` 
                               WHERE `id` = " . intval($id) . " AND department='$dept'";
             $request_result = mysqli_query($conn, $request_query);
@@ -80,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                 if (mysqli_query($conn, $insert_query)) {
                   // Update the status of the selected request
                   $update_status_query = "UPDATE `exam_requests` 
-                                          SET `status` = 'Sent' 
+                                          SET `sent_to_controller` = 'sent' 
                                           WHERE `id` = " . intval($id);
                   
                   if (!mysqli_query($conn, $update_status_query)) {
@@ -194,17 +193,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                                         <td><?php echo $row['course_credit']; ?></td>
                                         <td><?php echo $row['year']; ?></td>
                                         <td><?php echo $row['semester']; ?></td>
-                                        <td class="<?php echo strtolower($row['status']); ?>">
+                                        <td class="<?php echo strtolower($row['sent_to_department']); ?>">
                                             <?php 
                                             // Display status with icon
-                                            if ($row['status'] === 'Pending') {
+                                            if ($row['sent_to_department'] === 'pending') {
                                                 echo '<i class="fas fa-clock" style="color: orange;"></i> Pending';
-                                            } elseif ($row['status'] === 'Sent') {
-                                                echo '<i class="fas fa-check-circle" style="color: green;"></i> Sent';
-                                            } elseif ($row['status'] === 'Error') {
-                                                echo '<i class="fas fa-times-circle" style="color: red;"></i> Error';
+                                            } elseif ($row['sent_to_department'] === 'sent') {
+                                                echo '<i class="fas fa-check-circle" style="color: green;"></i> Approved';
+                                            } elseif ($row['sent_to_department'] === 'rejected') {
+                                                echo '<i class="fas fa-red-circle" style="color: red;"></i> Rejected';
                                             } else {
-                                                echo $row['status']; // Fallback for any other status
+                                                echo $row['sent_to_department']; // Fallback for any other status
                                             }
                                             ?>
                                         </td>
@@ -214,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                             </tbody>
                         </table>
                         <!-- Button to send list to Exam Controller -->
-                        <button type="submit" class="btn btn-primary" name="send_to_controller">Send to Exam Controller</button>
+                        <!-- <button type="submit" class="btn btn-primary" name="send_to_controller">Send to Exam Controller</button> -->
                     </form>
                 </div>
             </div>

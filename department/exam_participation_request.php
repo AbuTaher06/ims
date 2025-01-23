@@ -15,7 +15,13 @@ include("header.php");
 include("sidebar.php"); 
 include("../include/connect.php");
 
-$dept = $_SESSION['dept'];
+$dept_name = $_SESSION['dept'];
+$dept_sql = "select * from department where username='$dept_name'";
+$dept_result = mysqli_query($conn, $dept_sql);
+$dept_row = mysqli_fetch_assoc($dept_result);
+$dept = $dept_row['username'];
+
+
 
 // Initialize filter variables with default values
 $year = isset($_GET['year']) ? $_GET['year'] : '';
@@ -27,7 +33,7 @@ $exam_requests_query = "SELECT `id`, `student_name`, `student_id`, `session`, `p
                                `request_date` 
                         FROM `exam_requests`
                         WHERE department = '" . mysqli_real_escape_string($conn, $dept) . "' 
-                        AND status = 'pending'"; // Adjusted to include all records
+                        AND sent_from_department = 'pending'"; // Adjusted to include all records
 
 // Apply filters
 if (!empty($year)) {
@@ -48,72 +54,33 @@ $semesters_result = mysqli_query($conn, $semesters_query);
 
 // Handle sending to exam controller
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])) {
-    $selected_ids = $_POST['selected_ids'] ?? []; // Get selected IDs
+    $selected_ids = $_POST['selected_ids'] ?? [];
 
     if (count($selected_ids) > 0) {
         foreach ($selected_ids as $id) {
-            // Fetch the row from exam_requests using the selected ID
-            $request_query = "SELECT `student_name`, `student_id`, `session`, `phone`, `course_code`, 
-                                     `course_title`, `course_credit`, `year`, `semester`, `request_date`, `transcript_path` 
-                              FROM `exam_requests` 
-                              WHERE `status` = 'pending' AND `id` = " . intval($id) . " AND `department` = '" . mysqli_real_escape_string($conn, $dept) . "'";
-
-            $request_result = mysqli_query($conn, $request_query);
-
-            if ($request_result && mysqli_num_rows($request_result) > 0) {
-                $row = mysqli_fetch_assoc($request_result);
-                
-                // Prepare the insert query for exam_participation_list
-                $insert_query = "INSERT INTO `exam_participation_list` 
-                                 (`department`, `student_name`, `student_id`, `session`, `phone`, `course_code`, 
-                                  `course_title`, `course_credit`, `year`, `semester`, `status`, `request_date`, `transcript_path`) 
-                                 VALUES 
-                                 ('" . mysqli_real_escape_string($conn, $dept) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['student_name']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['student_id']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['session']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['phone']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['course_code']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['course_title']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['course_credit']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['year']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['semester']) . "', 
-                                  'pending', 
-                                  '" . mysqli_real_escape_string($conn, $row['request_date']) . "', 
-                                  '" . mysqli_real_escape_string($conn, $row['transcript_path']) . "')";
-                
-                // Execute the insert query
-                if (mysqli_query($conn, $insert_query)) {
-                    // Update the status of the selected request
-                    $update_status_query = "UPDATE `exam_requests` 
-                                            SET `status` = 'Sent' 
-                                            WHERE `id` = " . intval($id);
-                    
-                    if (!mysqli_query($conn, $update_status_query)) {
-                        $_SESSION['error'] = "Error updating status for " . $row['student_name'] . ": " . mysqli_error($conn);
-                        break; // Exit the loop on error
-                    }
-                } else {
-                    $_SESSION['error'] = "Error inserting request for " . $row['student_name'] . ": " . mysqli_error($conn);
-                    break; // Exit the loop on error
-                }
+            $update_status_query = "UPDATE `exam_requests` 
+                                    SET `sent_from_department` = 'sent' 
+                                    WHERE `id` = " . intval($id) . " 
+                                    AND `department` = '" . mysqli_real_escape_string($conn, $dept) . "' 
+                                    AND `sent_from_department` = 'pending'";
+            if (!mysqli_query($conn, $update_status_query)) {
+                $_SESSION['error'] = "Error updating status for request ID " . intval($id) . ": " . mysqli_error($conn);
+                break; // Stop on the first error
             }
         }
 
-        // If the loop completes without breaking
         if (!isset($_SESSION['error'])) {
-            $_SESSION['success'] = count($selected_ids) . " requests sent to the Exam Controller successfully.";
+            $_SESSION['success'] = count($selected_ids) . " requests updated successfully.";
         }
-
-        // Redirect to the same page with current filters
         header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
-        exit(); // Stop further execution
+        exit();
     } else {
-        $_SESSION['error'] = "No requests selected to send.";
+        $_SESSION['error'] = "No requests selected to update.";
         header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
-        exit(); // Stop further execution
+        exit();
     }
 }
+
 ?>
 
 <main id="main" class="main">

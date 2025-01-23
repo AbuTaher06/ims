@@ -22,12 +22,12 @@
         <span>Add Admin</span>
       </a>
     </li> -->
-    <li class="nav-item">
+    <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="add_course.php">
       <i class="bi bi-pencil-square"></i>
         <span>Add Course</span>
       </a>
-    </li>
+    </li> -->
 
     <li class="nav-item">
       <a class="nav-link collapsed" href="users-profile.php">
@@ -35,12 +35,12 @@
         <span>Profile</span>
       </a>
     </li>
-    <!-- <li class="nav-item">
-      <a class="nav-link collapsed" href="pages-faq.php">
-        <i class="bi bi-question-circle"></i>
-        <span>F.A.Q</span>
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="add_notice.php">
+        <i class="bi bi-plus"></i>
+        <span>Add Notice</span>
       </a>
-    </li> -->
+    </li>
   
     <!-- <li class="nav-item">
       <a class="nav-link collapsed" href="pages-contact.php">

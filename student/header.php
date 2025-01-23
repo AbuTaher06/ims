@@ -130,8 +130,9 @@ include("../include/connect.php");
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 <!-- Vendor JS Files -->
  <!-- Add this to header.php -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+ <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
 
 <script src="../admin/assets/vendor/apexcharts/apexcharts.min.js"></script>
 <script src="../admin/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

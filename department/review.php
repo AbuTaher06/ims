@@ -19,7 +19,7 @@ $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 // Fetch the details of the selected request
 $request_query = "SELECT `student_name`, `student_id`, `session`, `phone`, `course_code`, 
                          `course_title`, `course_credit`, `year`, `semester`, `transcript_path`, 
-                         `status`, `request_date` 
+                         `sent_from_department`, `request_date` 
                   FROM `exam_requests` 
                   WHERE `id` = $id";
 
@@ -35,7 +35,7 @@ if ($request_result && mysqli_num_rows($request_result) > 0) {
 
 // Handle the send to exam controller action
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])) {
-    $insert_query = "UPDATE `exam_requests` SET `status` = 'Sent' WHERE `id` = $id";
+    $insert_query = "UPDATE `exam_requests` SET sent_from_department = 'sent' WHERE `id` = $id";
 
     if (mysqli_query($conn, $insert_query)) {
         $_SESSION['success'] = "Request sent to exam controller successfully.";
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
     <div class="container mt-0">
         <div class="card mx-auto" style="max-width: 600px;">
             <div class="card-header">
-                <h2 class="text-center">Details of <?php echo htmlspecialchars($row['student_name']); ?>'s Request</h2>
+                <h2 class="text-center">Details of <?php echo htmlspecialchars($row['student_name']); ?>'s Application</h2>
             </div>
             <div class="card-body text-center">
                 <div class="text-light bg-dark">
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                         </tr>
                         <tr>
                             <th>Status</th>
-                            <td><?php echo htmlspecialchars($row['status']); ?></td>
+                            <td><?php echo htmlspecialchars($row['sent_from_department']); ?></td>
                         </tr>
                         <tr>
                             <th>Transcript</th>

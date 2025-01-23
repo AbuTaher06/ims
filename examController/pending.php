@@ -15,7 +15,7 @@ $session = isset($_GET['session']) ? $_GET['session'] : '';
 $semester = isset($_GET['semester']) ? $_GET['semester'] : '';
 
 // Build the SQL query with optional filters
-$pending_lists_query = "SELECT * FROM `exam_participation_list` WHERE status = 'Pending' AND reviewed_by_controller = 0";
+$pending_lists_query = "SELECT * FROM `exam_requests` WHERE sent_to_department = 'pending' AND reviewed_by_controller = 0";
 
 // Apply filters
 if (!empty($department)) {
@@ -34,7 +34,7 @@ if (!empty($semester)) {
 $pending_lists_result = mysqli_query($conn, $pending_lists_query);
 
 // Fetch all departments for the dropdown
-$department_query = "SELECT dept_name FROM department";
+$department_query = "SELECT username, dept_name FROM department";
 $department_result = mysqli_query($conn, $department_query);
 
 // Handle Approve All and Reject All actions
@@ -44,12 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         if (count($selected_ids) > 0) {
             $ids_list = implode(',', array_map('intval', $selected_ids)); // Convert IDs to a comma-separated list
-            $status = isset($_POST['approve_all']) ? 'Approved' : 'Rejected';
+            $sent_to_department = isset($_POST['approve_all']) ? 'Approved' : 'Rejected';
             
             // Prepare the update query
-            $update_query = "UPDATE `exam_participation_list` SET reviewed_by_controller = 1, status = '$status' WHERE id IN ($ids_list)";
+            $update_query = "UPDATE `exam_requests` SET reviewed_by_controller = 1, sent_to_department = '$sent_to_department' WHERE id IN ($ids_list)";
             mysqli_query($conn, $update_query);
-            $_SESSION['success'] = count($selected_ids) . " requests $status successfully.";
+            $_SESSION['success'] = count($selected_ids) . " requests $sent_to_department successfully.";
             header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET)); // Redirect to the same page
             exit();
         } else {
@@ -57,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
-
 ?>
 
 <main id="main" class="main">
@@ -81,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <select name="department" id="department" class="form-control" onchange="submitForm()">
                   <option value="">Select Department</option>
                   <?php while($dept = mysqli_fetch_assoc($department_result)): ?>
-                    <option value="<?php echo $dept['dept_name']; ?>" <?php if($department == $dept['dept_name']) echo 'selected'; ?>>
+                    <option value="<?php echo $dept['username']; ?>" <?php if($department == $dept['username']) echo 'selected'; ?>>
                       <?php echo $dept['dept_name']; ?>
                     </option>
                   <?php endwhile; ?>
@@ -124,12 +123,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </form>
           <!-- End Filter Form -->
 
-          <form method="POST" id="approveRejectForm"> <!-- Wrap the table in a form for bulk actions -->
+          <form method="POST" id="approveRejectForm">
             <table class="table table-bordered mt-3">
               <thead>
                 <tr>
-                  <th><input type="checkbox" id="selectAll"> <!-- Checkbox to select/deselect all -->
-                  <label for="selectAll">Select All</label></th>
+                  <th><input type="checkbox" id="selectAll"><label for="selectAll">Select All</label></th>
                   <th>ID</th>
                   <th>Department</th>
                   <th>Student Name</th>
@@ -139,9 +137,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <th>Course Title</th>
                   <th>Year</th>
                   <th>Semester</th>
-                  <th>Status</th>
                   <th>Request Date</th>
                   <th>Actions</th>
+                  <th>View Transcript</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,25 +156,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                       <td><?php echo $row['course_title']; ?></td>
                       <td><?php echo $row['year']; ?></td>
                       <td><?php echo $row['semester']; ?></td>
-                      <td><?php echo $row['status']; ?></td>
                       <td><?php echo $row['request_date']; ?></td>
-                      <td>
-                        <a href="review.php?id=<?php echo $row['id']; ?>" class="btn btn-warning">Review</a>
-                      </td>
+                      <td><a href="review.php?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-eye"></i> Review</a></td>
+                      <td><a href="transcript.php?id=<?php echo $row['student_id']; ?>" class="btn btn-info"><i class="fas fa-file-alt"></i> View Transcript</a></td>
                     </tr>
                   <?php endwhile; ?>
                 <?php else: ?>
-                  <tr>
-                    <td colspan="12" class="text-center">No records found</td>
-                  </tr>
+                  <tr><td colspan="13" class="text-center">No records found</td></tr>
                 <?php endif; ?>
               </tbody>
             </table>
 
             <div class="row">
               <div class="col-md-6">
-                <button type="submit" name="approve_all" class="btn btn-success">Approve All</button>
-                <button type="submit" name="reject_all" class="btn btn-danger">Reject All</button>
+                <button type="submit" name="approve_all" class="btn btn-success"><i class="fas fa-check"></i> Approve All</button>
+                <button type="submit" name="reject_all" class="btn btn-danger"><i class="fas fa-times"></i> Reject All</button>
               </div>
             </div>
           </form>
@@ -187,32 +181,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
   <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success mt-3" id="flash-message">
-      <?php
-      echo $_SESSION['success'];
-      unset($_SESSION['success']); // Clear session success message
-      ?>
+      <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
     </div>
   <?php endif; ?>
 
   <?php if (isset($_SESSION['error'])): ?>
     <div class="alert alert-danger mt-3" id="flash-message">
-      <?php
-      echo $_SESSION['error'];
-      unset($_SESSION['error']); // Clear session error message
-      ?>
+      <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
     </div>
   <?php endif; ?>
-</main><!-- End #main -->
+</main>
 
 <?php include("footer.php"); ?>
 
 <script>
-  // Automatically submit the form when any filter is changed
   function submitForm() {
     document.getElementById('filterForm').submit();
   }
-
-  // Select or deselect all checkboxes
   document.getElementById('selectAll').addEventListener('change', function() {
     const checkboxes = document.querySelectorAll('input[name="selected_ids[]"]');
     checkboxes.forEach(checkbox => {
@@ -220,6 +205,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     });
   });
   setTimeout(function() {
-        $('#flash-message').fadeOut('slow');
-    }, 5000);
+    $('#flash-message').fadeOut('slow');
+  }, 5000);
 </script>

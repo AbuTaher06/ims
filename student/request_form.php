@@ -1,7 +1,6 @@
 <?php
-// ... (existing PHP code above)
 session_start();
-$pageTitle = "Request Form";
+$pageTitle = "Course Improvement Application form";
 include("header.php"); 
 include("sidebar.php"); 
 include("../include/connect.php");
@@ -10,27 +9,84 @@ $uname = $_SESSION['student'];
 $sql = "SELECT * FROM students WHERE email='$uname'";
 $result = mysqli_query($conn, $sql);
 $row = mysqli_fetch_array($result);
-$dept = $row['department'];
-$name = $row['name'];
+$dept_name = $row['department'];
+$student_name = $row['name'];
 $roll = $row['stud_id'];
 $phone = $row['phone'];
+
+$dept_sql="SELECT * FROM department WHERE dept_name='$dept_name'";
+$dept_result = mysqli_query($conn, $dept_sql);
+$dept_row = mysqli_fetch_array($dept_result);
+$dept = $dept_row['username'];
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $student_id = $_POST['student_id'];
-    $dept = $_POST['department'];
+ //   $dept = $_POST['department'];
     $session = $_POST['session'];
     $phone = $_POST['phone'];
-
+    
     $courseData = $_POST['courses'];
     $uploadErrors = [];
+    $totalSubmittedCreditsByYear = [];
 
+    // Calculate the total credits being submitted grouped by year
+    foreach ($courseData as $course) {
+        $year = $course['year'];
+        $courseCredit = (float)$course['course_credit'];
+
+        if (!isset($totalSubmittedCreditsByYear[$year])) {
+            $totalSubmittedCreditsByYear[$year] = 0;
+        }
+
+        $totalSubmittedCreditsByYear[$year] += $courseCredit;
+    }
+
+    // Fetch total approved credits for the student, grouped by year
+    $query = "SELECT year, SUM(course_credit) AS total_approved_credits 
+              FROM exam_requests 
+              WHERE student_id = '$student_id' 
+                AND session = '$session' 
+                AND sent_from_department != 'pending'
+                AND department = '$dept'
+              GROUP BY year";
+    $result = mysqli_query($conn, $query);
+
+    // Initialize an array to store the approved credits by year
+    $totalApprovedCreditsByYear = [];
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $year = $row['year'];
+            $totalApprovedCreditsByYear[$year] = (float)$row['total_approved_credits'];
+        }
+    } else {
+        echo "<p>No data found or error in query execution.</p>";
+        echo "Error: " . mysqli_error($conn);  // Display query error for debugging
+    }
+
+    // Validate the combined total credits for each year
+    foreach ($totalSubmittedCreditsByYear as $year => $submittedCredits) {
+        // Fetch the already approved credits for the year
+        $approvedCredits = isset($totalApprovedCreditsByYear[$year]) ? $totalApprovedCreditsByYear[$year] : 0;
+        $combinedCredits = $submittedCredits + $approvedCredits;
+
+        // If the combined credits exceed 6, show an error message
+        if ($combinedCredits > 6) {
+            $_SESSION['flash_message'] = "Your are unable to submit. For Year $year, you cannot submit more than " . (6 - $approvedCredits) . " credits. 
+            You already have $approvedCredits approved credits.";
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
+        }
+    }
+
+    // Proceed with inserting data into the database if validation passes
     foreach ($courseData as $index => $course) {
         $courseTitle = $course['course_title'];
         $courseCode = $course['course_code'];
         $courseCredit = $course['course_credit'];
         $courseYear = $course['year'];
-        $courseSemester = $course['semester'];
 
+        // Handle file upload
         if (isset($_FILES['transcripts']['name'][$index]) && $_FILES['transcripts']['error'][$index] == 0) {
             $targetDir = "transcripts/";
             $fileName = basename($_FILES['transcripts']['name'][$index]);
@@ -42,11 +98,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (move_uploaded_file($_FILES['transcripts']['tmp_name'][$index], $targetFilePath)) {
                     $transcriptPath = $targetFilePath;
 
+                    // Insert the course data into the database
                     $query = "INSERT INTO exam_requests 
-                              (student_name, department, student_id, session, phone, course_code, course_title, course_credit, year, semester, transcript_path, status, request_date) 
+                              (student_name, department, student_id, session, phone, course_code, course_title, course_credit, year, transcript_path, sent_from_department, request_date) 
                               VALUES 
-                              ('$name', '$dept', '$student_id', '$session', '$phone', '$courseCode', '$courseTitle', '$courseCredit', '$courseYear', '$courseSemester', '$transcriptPath', 'pending', NOW())";
-
+                              ('$name', '$dept', '$student_id', '$session', '$phone', '$courseCode', '$courseTitle', '$courseCredit', '$courseYear', '$transcriptPath', 'pending', NOW())";
+                        
                     if (!mysqli_query($conn, $query)) {
                         $uploadErrors[] = "Error saving course $courseCode: " . mysqli_error($conn);
                     }
@@ -67,12 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $_SESSION['flash_message'] = implode("<br>", $uploadErrors);
     }
 
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header("Location: index.php");
     exit();
 }
-
-// ... (existing PHP code continues)
 ?>
+
+
+
 <!-- Include Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -82,19 +140,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="col-md-8">
                 <div class="card shadow-lg">
                     <div class="card-header text-center bg-primary text-white">
-                        <h2 class="mb-0">Submit Course Retake Requests</h2>
+                        <h2 class="mb-0">Course Improvement Application form</h2>
                         <p>Please fill in the details carefully</p>
                     </div>
                     <div class="card-body bg-light">
+                        <div class="alert alert-info">
+                            <strong>Note:</strong> You can submit a maximum of 6 credits per year. 
+                            If you have already submitted some credits, you can only submit the remaining credits.
+                        </div>
+                        <?php if (isset($_SESSION['flash_message'])) : ?>
+                        <div id="flash-message" class="alert alert-info alert-dismissible fade show" role="alert">
+                            <?php echo $_SESSION['flash_message']; ?>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    <?php endif; ?>
+                    <?php unset($_SESSION['flash_message']); ?>
+
+
                         <form method="POST" action="" enctype="multipart/form-data" id="course-form">
                             <!-- User Information -->
                             <div class="form-group">
                                 <label for="name">Name:</label>
-                                <input type="text" class="form-control" id="name" name="name" value="<?php echo $name; ?>" required>
+                                <input type="text" class="form-control" id="name" name="name" value="<?php echo $student_name; ?>" required>
                             </div>
                             <div class="form-group">
                                 <label for="department">Department:</label>
-                                <input type="text" class="form-control" id="department" name="department" value="<?php echo $dept; ?>" required>
+                                <input type="text" class="form-control" id="department" name="department" value="<?php echo $dept_name; ?>" required>
                             </div>
                             <div class="form-group">
                                 <label for="student_id">Student ID:</label>
@@ -103,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="form-group">
                                 <label for="session">Current Session:</label>
                                 <select class="form-control" id="session" name="session" required>
-                                    <option value="">Select Session</option>
+                                    <option value="">Select Session with in which you are participating Exam</option>
                                     <?php for ($year = 2019; $year <= 2029; $year++) {
                                         $next_year = $year + 1;
                                         echo "<option value='{$year}-{$next_year}'>{$year}-{$next_year}</option>";
@@ -152,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <hr>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-secondary" id="add-course"><i class="fas fa-plus-circle"></i> Add 1 new Course</button>
+                            <button type="button" class="btn btn-secondary" id="add-course"><i class="fas fa-plus-circle"></i> Add Another Course</button>
                             <button type="submit" class="btn btn-primary btn-block mt-3" id="submit-btn"><i class="fas fa-paper-plane"></i> Submit Requests</button>
                         </form>
                     </div>
@@ -243,4 +316,16 @@ document.getElementById('course-form').addEventListener('submit', function (even
 });
 // Attach remove event on page load for the default course
 attachRemoveEvent();
+
+window.addEventListener('DOMContentLoaded', (event) => {
+    setTimeout(function() {
+        const flashMessage = document.getElementById('flash-message');
+        if (flashMessage) {
+            flashMessage.classList.remove('show');
+            flashMessage.classList.add('fade');
+            setTimeout(() => flashMessage.remove(), 500); // Extra delay for complete removal
+        }
+    }, 5000);
+});
+
 </script>
