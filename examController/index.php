@@ -64,7 +64,7 @@ include("../include/connect.php");
       <div class="card text-center bg-secondary">
         <div class="card-body">
           <?php
-          $pending_requests = mysqli_query($conn, "SELECT * FROM exam_requests WHERE reviewed_by_controller = 0");
+          $pending_requests = mysqli_query($conn, "SELECT * FROM `exam_requests` WHERE sent_from_department = 'sent' AND reviewed_by_controller = 0 and sent_to_department = 'pending'");
           $pending_count = mysqli_num_rows($pending_requests);
           ?>
           <h5 class="card-title"><i class="fas fa-hourglass-half"></i> Pending Improvement Application</h5>
@@ -79,7 +79,7 @@ include("../include/connect.php");
       <div class="card text-center bg-success">
         <div class="card-body">
           <?php
-          $approved_requests = mysqli_query($conn, "SELECT * FROM exam_requests WHERE reviewed_by_controller = 1 AND sent_to_department = 'sent'");
+          $approved_requests = mysqli_query($conn, "SELECT * FROM `exam_requests` WHERE sent_from_department = 'sent' AND reviewed_by_controller = 1 and sent_to_department = 'approved'");
           $approved_count = mysqli_num_rows($approved_requests);
           ?>
           <h5 class="card-title"><i class="fas fa-check-circle"></i> Approved Improvement Application</h5>
@@ -94,7 +94,7 @@ include("../include/connect.php");
       <div class="card text-center bg-danger">
         <div class="card-body">
           <?php
-          $rejected_requests = mysqli_query($conn, "SELECT * FROM exam_requests WHERE reviewed_by_controller = 1 AND sent_to_department = 'rejected'");
+          $rejected_requests = mysqli_query($conn, "SELECT * FROM `exam_requests` WHERE sent_from_department = 'sent' AND reviewed_by_controller = 1 and sent_to_department = 'rejected'");
           $rejected_count = mysqli_num_rows($rejected_requests);
           ?>
           <h5 class="card-title"><i class="fas fa-times-circle"></i> Rejected Improvement Application</h5>

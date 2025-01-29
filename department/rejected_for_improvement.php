@@ -19,7 +19,7 @@ $dept = $_SESSION['dept'];
 $filter_session = $_GET['session'] ?? '';
 $filter_year = $_GET['year'] ?? '';
 
-$filter_conditions = "WHERE `sent_to_department` = 'rejected' AND `department` = '$dept' AND `reviewed_by_controller` = '1'";
+$filter_conditions = "WHERE `sent_to_department` = 'rejected' AND `department` = '$dept' AND `reviewed_by_controller` = '1' and sent_from_department = 'sent'";
 if ($filter_session) {
     $filter_conditions .= " AND `session` = '" . mysqli_real_escape_string($conn, $filter_session) . "'";
 }

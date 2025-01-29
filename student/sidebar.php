@@ -10,7 +10,7 @@
     <li class="nav-heading">Pages</li>
 
     <li class="nav-item">
-      <a class="nav-link collapsed" href="notice.php">
+      <a class="nav-link collapsed" href="View_notices.php">
         <i class="bi bi-envelope"></i>
         <span>Notices</span>
       </a>

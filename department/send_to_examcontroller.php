@@ -9,6 +9,7 @@ $dept = $_SESSION['dept'];
 if (isset($_POST['send_to_controller'])) {
     // Fetch exam requests for the department only with status 'Pending'
     $exam_requests_query = "SELECT * FROM `exam_requests` 
+        
                             WHERE department='$dept' 
                             AND status = 'pending'";
     $exam_requests_result = mysqli_query($conn, $exam_requests_query);

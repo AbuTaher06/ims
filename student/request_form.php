@@ -13,6 +13,7 @@ $dept_name = $row['department'];
 $student_name = $row['name'];
 $roll = $row['stud_id'];
 $phone = $row['phone'];
+$session = $row['session'];
 
 $dept_sql="SELECT * FROM department WHERE dept_name='$dept_name'";
 $dept_result = mysqli_query($conn, $dept_sql);
@@ -22,7 +23,7 @@ $dept = $dept_row['username'];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $student_id = $_POST['student_id'];
- //   $dept = $_POST['department'];
+    $dept = $_POST['department'];
     $session = $_POST['session'];
     $phone = $_POST['phone'];
     
@@ -47,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               FROM exam_requests 
               WHERE student_id = '$student_id' 
                 AND session = '$session' 
-                AND sent_from_department != 'pending'
+                AND sent_from_department = 'pending'
                 AND department = '$dept'
               GROUP BY year";
     $result = mysqli_query($conn, $query);
@@ -72,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // If the combined credits exceed 6, show an error message
         if ($combinedCredits > 6) {
-            $_SESSION['flash_message'] = "Your are unable to submit. For Year $year, you cannot submit more than " . (6 - $approvedCredits) . " credits. 
+            $_SESSION['flash_message'] = " For Year $year, you cannot submit more than " . (6 - $approvedCredits) . " credits. 
             You already have $approvedCredits approved credits.";
             header("Location: " . $_SERVER['PHP_SELF']);
             exit();
@@ -85,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $courseCode = $course['course_code'];
         $courseCredit = $course['course_credit'];
         $courseYear = $course['year'];
+        $semester = $_POST['courses'][$index]['semester'];
 
         // Handle file upload
         if (isset($_FILES['transcripts']['name'][$index]) && $_FILES['transcripts']['error'][$index] == 0) {
@@ -100,9 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     // Insert the course data into the database
                     $query = "INSERT INTO exam_requests 
-                              (student_name, department, student_id, session, phone, course_code, course_title, course_credit, year, transcript_path, sent_from_department, request_date) 
+                              (student_name, department, student_id, session, phone, course_code, course_title, course_credit, year,semester, transcript_path, sent_from_department, request_date) 
                               VALUES 
-                              ('$name', '$dept', '$student_id', '$session', '$phone', '$courseCode', '$courseTitle', '$courseCredit', '$courseYear', '$transcriptPath', 'pending', NOW())";
+                              ('$name', '$dept', '$student_id', '$session', '$phone', '$courseCode', '$courseTitle', '$courseCredit', '$courseYear','$semester', '$transcriptPath', 'pending', NOW())";
                         
                     if (!mysqli_query($conn, $query)) {
                         $uploadErrors[] = "Error saving course $courseCode: " . mysqli_error($conn);
@@ -119,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     if (empty($uploadErrors)) {
-        $_SESSION['flash_message'] = "All courses submitted successfully!";
+        echo "<script>alert('Your request has been submitted successfully.');</script>";
     } else {
         $_SESSION['flash_message'] = implode("<br>", $uploadErrors);
     }
@@ -133,6 +135,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!-- Include Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+.form-group label {
+    font-weight: bold; /* Makes all labels bold */
+}
+</style>
 
 <main id="main" class="main" style="background-color: #f8f9fa; padding: 50px 0;">
     <div class="container">
@@ -159,75 +166,80 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <?php unset($_SESSION['flash_message']); ?>
 
 
-                        <form method="POST" action="" enctype="multipart/form-data" id="course-form">
-                            <!-- User Information -->
-                            <div class="form-group">
-                                <label for="name">Name:</label>
-                                <input type="text" class="form-control" id="name" name="name" value="<?php echo $student_name; ?>" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="department">Department:</label>
-                                <input type="text" class="form-control" id="department" name="department" value="<?php echo $dept_name; ?>" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="student_id">Student ID:</label>
-                                <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo $roll; ?>" required readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="session">Current Session:</label>
-                                <select class="form-control" id="session" name="session" required>
-                                    <option value="">Select Session with in which you are participating Exam</option>
-                                    <?php for ($year = 2019; $year <= 2029; $year++) {
-                                        $next_year = $year + 1;
-                                        echo "<option value='{$year}-{$next_year}'>{$year}-{$next_year}</option>";
-                                    } ?>
-                                </select>
-                            </div>
-                            <!-- Course Container -->
-                            <div id="course-container">
-                                <div class="course-group" id="course-1" style="background-color: #e7f3fe; border-left: 5px solid #2196F3;">
-                                    <h5><i class="fas fa-book"></i> Course 1</h5>
-                                    <div class="form-group">
-                                        <label for="course_title_1">Course Title:</label>
-                                        <input type="text" class="form-control" name="courses[0][course_title]" placeholder="Enter Course Title" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="course_code_1">Course Code:</label>
-                                        <input type="text" class="form-control" name="courses[0][course_code]" placeholder="Enter Course Code" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="course_credit_1">Course Credit:</label>
-                                        <input type="text" class="form-control" name="courses[0][course_credit]" placeholder="Enter Course Credit" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="year_1">Year:</label>
-                                        <select class="form-control" name="courses[0][year]" required>
-                                            <option value="">Select Year</option>
-                                            <option value="1st Year">1st</option>
-                                            <option value="2nd Year">2nd</option>
-                                            <option value="3rd Year">3rd</option>
-                                            <option value="4th Year">4th</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="semester_1">Semester:</label>
-                                        <select class="form-control" name="courses[0][semester]" required>
-                                            <option value="">Select Semester</option>
-                                            <option value="1st">1st</option>
-                                            <option value="2nd">2nd</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="transcript_1">Add Transcript:</label>
-                                        <input type="file" class="form-control" name="transcripts[]" accept=".pdf, .jpg, .jpeg, .png" required>
-                                    </div>
-                                    <button type="button" class="btn btn-danger remove-course"><i class="fas fa-trash-alt"></i> Remove</button>
-                                    <hr>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-secondary" id="add-course"><i class="fas fa-plus-circle"></i> Add Another Course</button>
-                            <button type="submit" class="btn btn-primary btn-block mt-3" id="submit-btn"><i class="fas fa-paper-plane"></i> Submit Requests</button>
-                        </form>
+                    <form method="POST" action="" enctype="multipart/form-data" id="course-form">
+    <!-- User Information -->
+    <div class="form-group">
+        <label for="name"><strong>Name:</strong></label>
+        <input type="text" class="form-control" id="name" name="name" value="<?php echo $student_name; ?>" required readonly>
+    </div>
+    <div class="form-group">
+        <label for="department"><strong>Department:</strong></label>
+        <input type="text" class="form-control" id="department" name="department" value="<?php echo $dept; ?>" required>
+    </div>
+    <div class="form-group">
+        <label for="student_id"><strong>Student ID:</strong></label>
+        <input type="text" class="form-control" id="student_id" name="student_id" value="<?php echo $roll; ?>" required readonly>
+    </div>
+    <div class="form-group">
+        <label for="current_session"><strong>Current Session:</strong></label>
+        <input type="text" class="form-control" id="current_session" name="current_session" value="<?php echo $session; ?>" required readonly>
+    </div>
+    <div class="form-group">
+        <label for="session"><strong>Improvement Session:</strong></label>
+        <select class="form-control" id="session" name="session" required>
+            <option value="">Select Session within which you are participating Exam</option>
+            <?php for ($year = 2019; $year <= 2029; $year++) {
+                $next_year = $year + 1;
+                echo "<option value='{$year}-{$next_year}'>{$year}-{$next_year}</option>";
+            } ?>
+        </select>
+    </div>
+    <!-- Course Container -->
+    <div id="course-container">
+        <div class="course-group" id="course-1" style="background-color: #e7f3fe; border-left: 5px solid #2196F3;">
+            <h5><i class="fas fa-book"></i> Course 1</h5>
+            <div class="form-group">
+                <label for="course_title_1"><strong>Course Title:</strong></label>
+                <input type="text" class="form-control" name="courses[0][course_title]" placeholder="Enter Course Title" required>
+            </div>
+            <div class="form-group">
+                <label for="course_code_1"><strong>Course Code:</strong></label>
+                <input type="text" class="form-control" name="courses[0][course_code]" placeholder="Enter Course Code" required>
+            </div>
+            <div class="form-group">
+                <label for="course_credit_1"><strong>Course Credit:</strong></label>
+                <input type="text" class="form-control" name="courses[0][course_credit]" placeholder="Enter Course Credit" required>
+            </div>
+            <div class="form-group">
+                <label for="year_1"><strong>Year:</strong></label>
+                <select class="form-control" name="courses[0][year]" required>
+                    <option value="">Select Year</option>
+                    <option value="1st Year">1st</option>
+                    <option value="2nd Year">2nd</option>
+                    <option value="3rd Year">3rd</option>
+                    <option value="4th Year">4th</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="semester_1"><strong>Semester:</strong></label>
+                <select class="form-control" name="courses[0][semester]" required>
+                    <option value="">Select Semester</option>
+                    <option value="1st">1st</option>
+                    <option value="2nd">2nd</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="transcript_1"><strong>Add Transcript:</strong></label>
+                <input type="file" class="form-control" name="transcripts[]" accept=".pdf, .jpg, .jpeg, .png" required>
+            </div>
+            <button type="button" class="btn btn-danger remove-course"><i class="fas fa-trash-alt"></i> Remove</button>
+            <hr>
+        </div>
+    </div>
+    <button type="button" class="btn btn-secondary" id="add-course"><i class="fas fa-plus-circle"></i> Add Another Course</button>
+    <button type="submit" class="btn btn-primary btn-block mt-3" id="submit-btn"><i class="fas fa-paper-plane"></i> Submit Requests</button>
+</form>
+
                     </div>
                 </div>
             </div>

@@ -15,7 +15,7 @@ $session = isset($_GET['session']) ? $_GET['session'] : '';
 $semester = isset($_GET['semester']) ? $_GET['semester'] : '';
 
 // Build the SQL query with optional filters
-$sent_lists_query = "SELECT * FROM `exam_requests` WHERE sent_to_department = 'sent' AND reviewed_by_controller = 1";
+$sent_lists_query = "SELECT * FROM `exam_requests` WHERE sent_from_department = 'sent' AND reviewed_by_controller = 1 and sent_to_department = 'approved'";
 
 // Apply filters
 if (!empty($department)) {
@@ -40,7 +40,7 @@ $department_result = mysqli_query($conn, $department_query);
 
 <main id="main" class="main">
   <div class="pagetitle">
-    <h1>sent Exam Participation Lists</h1>
+    <h1>Approved Exam Participation Lists</h1>
   </div><!-- End Page Title -->
 
   <div class="row">
@@ -135,10 +135,10 @@ $department_result = mysqli_query($conn, $department_query);
           <td><?php echo $row['sent_to_department']; ?></td>
           <td><?php echo $row['request_date']; ?></td>
           <td>
-            <a href="transcript.php?id=<?php echo $row['student_id']; ?>" class="btn btn-info">
-              <i class="fas fa-file-alt"></i> View Transcript
-            </a>
-          </td>
+                             <a href="../student/transcripts/<?php echo basename($row['transcript_path']); ?>" target="_blank">
+                                <i class="fas fa-file-alt"></i> View Transcript
+                             </a>
+        </td>
         </tr>
       <?php endwhile; ?>
     <?php else: ?>

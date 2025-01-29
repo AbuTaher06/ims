@@ -29,7 +29,7 @@ if (isset($_POST['admin_id'])) {
                     <div class="col-md-12">
                         <div class="row">
                             <div class="col-md-6">
-                                <h5 class="text-center">All Admin</h5>
+                                <h5 class="text-center"><i class="fas fa-users"></i> All Admins</h5>
 
                                 <?php
                                 $ad = $_SESSION['admin'];
@@ -82,7 +82,19 @@ if (isset($_POST['admin_id'])) {
                                     $pass= $_POST['pass'];
                                     $image= $_FILES['img']['name'];
                                     $error=array();
-                                    if(empty($uname)) {
+                                    $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif');
+                                    $file_extension = pathinfo($image, PATHINFO_EXTENSION);
+
+                                    // Check if there are already 2 admins
+                                    $admin_count_sql = "SELECT COUNT(*) as count FROM admin";
+                                    $admin_count_result = mysqli_query($conn, $admin_count_sql);
+                                    $admin_count_row = mysqli_fetch_assoc($admin_count_result);
+                                    $admin_count = $admin_count_row['count'];
+
+                                    if($admin_count >= 2) {
+                                        $error['u'] = 'Cannot add more than 2 admins.';
+                                    }
+                                    else if(empty($uname)) {
                                         $error['u'] = 'Enter Admin Username';
                                     }
                                     else if(empty($pass)) { 
@@ -90,6 +102,9 @@ if (isset($_POST['admin_id'])) {
                                     }
                                     else if(empty($image)) {
                                         $error['u'] = 'Add Admin Picture';
+                                    }
+                                    else if(!in_array($file_extension, $allowed_extensions)) {
+                                        $error['u'] = 'Invalid file type. Only JPG, JPEG, PNG, and GIF are allowed.';
                                     }
                                     if(count($error) == 0) {
                                         $sql="INSERT INTO admin(username,password,profile) VALUES('$uname','$pass','$image')";
@@ -109,7 +124,7 @@ if (isset($_POST['admin_id'])) {
                                     $show="";
                                 }
                                 ?>
-                                <h5 class="text-center">Add Admin</h5>
+                                <h5 class="text-center"><i class="fas fa-user-plus"></i> Add Admin</h5>
                                 <form method="post" enctype="multipart/form-data">
                                     <?php echo $show; ?>
                                     <div class="form-group">
@@ -117,10 +132,18 @@ if (isset($_POST['admin_id'])) {
                                         <input type="text" name="uname" class="form-control" autocomplete="off">
                                     </div>
 
-                                    <div class="form-group">
+                                                                        <div class="form-group">
                                         <label>Password</label>
-                                        <input type="password" name="pass" class="form-control">
+                                        <div class="input-group">
+                                            <input type="password" name="pass" id="pass" class="form-control" required>
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary" id="togglePass">
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
+
 
                                     <div class="form-group">
                                         <label>Add Admin Picture</label>
@@ -139,3 +162,19 @@ if (isset($_POST['admin_id'])) {
 <?php 
 include('footer.php');
 ?>
+<script>
+    document.getElementById('togglePass').addEventListener('click', function () {
+        const passField = document.getElementById('pass');
+        const icon = this.querySelector('i');
+        // Toggle the password field type
+        if (passField.type === 'password') {
+            passField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+</script>

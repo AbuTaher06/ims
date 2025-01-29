@@ -77,21 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                 
                 // Execute the insert query
                 if (mysqli_query($conn, $insert_query)) {
-                  // Update the status of the selected request
-                  $update_status_query = "UPDATE `exam_requests` 
-                                          SET `sent_to_controller` = 'sent' 
-                                          WHERE `id` = " . intval($id);
-                  
-                  if (!mysqli_query($conn, $update_status_query)) {
-                      $_SESSION['error'] = "Error updating status for " . $row['student_name'] . ": " . mysqli_error($conn);
-                      break; // Exit the loop on error
-                  }
-              } else {
-                  $_SESSION['error'] = "Error inserting request for " . $row['student_name'] . ": " . mysqli_error($conn);
-                  break; // Exit the loop on error
-              }
+                    // Update the status of the selected request
+                    $update_status_query = "UPDATE `exam_requests` 
+                                            SET `sent_to_controller` = 'sent' 
+                                            WHERE `id` = " . intval($id);
+                    
+                    if (!mysqli_query($conn, $update_status_query)) {
+                        $_SESSION['error'] = "Error updating status for " . $row['student_name'] . ": " . mysqli_error($conn);
+                        break; // Exit the loop on error
+                    }
+                } else {
+                    $_SESSION['error'] = "Error inserting request for " . $row['student_name'] . ": " . mysqli_error($conn);
+                    break; // Exit the loop on error
+                }
             }
-             
         }
 
         // If the loop completes without breaking
@@ -160,61 +159,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                     </form>
                     <!-- End Filter Form -->
 
-                    <form method="POST" action="">
-                        <table class="table table-striped table-bordered table-hover">
-                            <thead style="background-color: #007bff; color: white;">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead style="background-color: #007bff; color: white;">
+                            <tr>
+                                <th>ID</th>
+                                <th>Student Name</th>
+                                <th>Student ID</th>
+                                <th>Session</th>
+                                <th>Phone</th>
+                                <th>Course Code</th>
+                                <th>Course Title</th>
+                                <th>Course Credit</th>
+                                <th>Year</th>
+                                <th>Semester</th>
+                                <th>Status</th>
+                                <th>Request Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = mysqli_fetch_assoc($exam_requests_result)): ?>
                                 <tr>
-                                    <th><input type="checkbox" id="selectAll"> Select All</th>
-                                    <th>ID</th>
-                                    <th>Student Name</th>
-                                    <th>Student ID</th>
-                                    <th>Session</th>
-                                    <th>Phone</th>
-                                    <th>Course Code</th>
-                                    <th>Course Title</th>
-                                    <th>Course Credit</th>
-                                    <th>Year</th>
-                                    <th>Semester</th>
-                                    <th>Status</th>
-                                    <th>Request Date</th>
+                                    <td><?php echo $row['id']; ?></td>
+                                    <td><?php echo $row['student_name']; ?></td>
+                                    <td><?php echo $row['student_id']; ?></td>
+                                    <td><?php echo $row['session']; ?></td>
+                                    <td><?php echo $row['phone']; ?></td>
+                                    <td><?php echo $row['course_code']; ?></td>
+                                    <td><?php echo $row['course_title']; ?></td>
+                                    <td><?php echo $row['course_credit']; ?></td>
+                                    <td><?php echo $row['year']; ?></td>
+                                    <td><?php echo $row['semester']; ?></td>
+                                    <td class="<?php echo strtolower($row['sent_to_department']); ?>">
+                                        <?php 
+                                        // Display status with icon
+                                        if ($row['sent_to_department'] === 'pending') {
+                                            echo '<i class="fas fa-clock" style="color: orange;"></i> Pending';
+                                        } elseif ($row['sent_to_department'] === 'sent') {
+                                            echo '<i class="fas fa-check-circle" style="color: green;"></i> Approved';
+                                        } elseif ($row['sent_to_department'] === 'rejected') {
+                                            echo '<i class="fas fa-times-circle" style="color: red;"></i> Rejected';
+                                        } else {
+                                            echo $row['sent_to_department']; // Fallback for any other status
+                                        }
+                                        ?>
+                                    </td>
+                                    <td><?php echo $row['request_date']; ?></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = mysqli_fetch_assoc($exam_requests_result)): ?>
-                                    <tr>
-                                        <td><input type="checkbox" name="selected_ids[]" value="<?php echo $row['id']; ?>"></td>
-                                        <td><?php echo $row['id']; ?></td>
-                                        <td><?php echo $row['student_name']; ?></td>
-                                        <td><?php echo $row['student_id']; ?></td>
-                                        <td><?php echo $row['session']; ?></td>
-                                        <td><?php echo $row['phone']; ?></td>
-                                        <td><?php echo $row['course_code']; ?></td>
-                                        <td><?php echo $row['course_title']; ?></td>
-                                        <td><?php echo $row['course_credit']; ?></td>
-                                        <td><?php echo $row['year']; ?></td>
-                                        <td><?php echo $row['semester']; ?></td>
-                                        <td class="<?php echo strtolower($row['sent_to_department']); ?>">
-                                            <?php 
-                                            // Display status with icon
-                                            if ($row['sent_to_department'] === 'pending') {
-                                                echo '<i class="fas fa-clock" style="color: orange;"></i> Pending';
-                                            } elseif ($row['sent_to_department'] === 'sent') {
-                                                echo '<i class="fas fa-check-circle" style="color: green;"></i> Approved';
-                                            } elseif ($row['sent_to_department'] === 'rejected') {
-                                                echo '<i class="fas fa-red-circle" style="color: red;"></i> Rejected';
-                                            } else {
-                                                echo $row['sent_to_department']; // Fallback for any other status
-                                            }
-                                            ?>
-                                        </td>
-                                        <td><?php echo $row['request_date']; ?></td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                        <!-- Button to send list to Exam Controller -->
-                        <!-- <button type="submit" class="btn btn-primary" name="send_to_controller">Send to Exam Controller</button> -->
-                    </form>
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                    <!-- Button to send list to Exam Controller -->
+                    <!-- <button type="submit" class="btn btn-primary" name="send_to_controller">Send to Exam Controller</button> -->
                 </div>
             </div>
         </div>
@@ -246,14 +241,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
         document.querySelector('form[action=""]').submit();
     }
 
-    // Select or deselect all checkboxes
-    document.getElementById('selectAll').addEventListener('change', function() {
-        const checkboxes = document.querySelectorAll('input[name="selected_ids[]"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-
     // Flash message timeout
     setTimeout(function() {
         const flashMessage = document.getElementById('flash-message');
@@ -263,8 +250,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
     }, 5000);
 </script>
 
-
-
 <style>
     /* Status color styles */
     .pending {
@@ -273,7 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
     .sent {
         color: green; /* Color for sent status */
     }
-    .error {
-        color: red; /* Color for error status */
+    .rejected {
+        color: red; /* Color for rejected status */
     }
 </style>

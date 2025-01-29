@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
         }
 
         if (!isset($_SESSION['error'])) {
-            $_SESSION['success'] = count($selected_ids) . " requests updated successfully.";
+            $_SESSION['success'] = count($selected_ids) . " requests sent successfully.";
         }
         header("Location: " . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
         exit();
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="selectAll"> <label for="selectAll">Select All</label></th>
-                                    <th>ID</th>
+                                    <th>#</th>
                                     <th>Student Name</th>
                                     <th>Student ID</th>
                                     <th>Session</th>
@@ -152,10 +152,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_to_controller'])
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($row = mysqli_fetch_assoc($exam_requests_result)): ?>
+                                <?php
+                                $counter = 1; 
+                                while ($row = mysqli_fetch_assoc($exam_requests_result)): ?>
                                     <tr>
                                         <td><input type="checkbox" name="selected_ids[]" value="<?php echo $row['id']; ?>"></td>
-                                        <td><?php echo $row['id']; ?></td>
+                                        <td><?php echo $counter++; ?></td>
                                         <td><?php echo $row['student_name']; ?></td>
                                         <td><?php echo $row['student_id']; ?></td>
                                         <td><?php echo $row['session']; ?></td>

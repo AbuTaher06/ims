@@ -22,9 +22,9 @@ $row = $result->fetch_assoc();
 
 // Update Password
 if (isset($_POST['update_pass'])) {
-    $old_pass = $_POST['old_pass'];
-    $new_pass = $_POST['new_pass'];
-    $con_pass = $_POST['con_pass'];
+    $old_pass = htmlspecialchars($_POST['old_pass']);
+    $new_pass = htmlspecialchars($_POST['new_pass']);
+    $con_pass = htmlspecialchars($_POST['con_pass']);
 
     // Fetch current password hash from database
     $current_password_hashed = $row['password'];
@@ -32,13 +32,14 @@ if (isset($_POST['update_pass'])) {
     // Validate form inputs and passwords
     if (empty($old_pass) || empty($new_pass) || empty($con_pass)) {
         $error = "All fields are required";
-    } elseif ($old_pass != $current_password_hashed) {
+    } elseif (!password_verify($old_pass, $current_password_hashed)) {
         $error = "Invalid old password";
     } elseif ($new_pass !== $con_pass) {
         $error = "New password and confirm password do not match";
     } else {
+        $new_password_hashed = password_hash($new_pass, PASSWORD_DEFAULT);
         $update_stmt = $conn->prepare("UPDATE admin SET password = ? WHERE username = ?");
-        $update_stmt->bind_param("ss", $con_pass, $username);
+        $update_stmt->bind_param("ss", $new_password_hashed, $username);
 
         if ($update_stmt->execute()) {
             echo "<script>alert('Password Updated Successfully');</script>";
@@ -55,8 +56,7 @@ if (isset($_POST['update_pass'])) {
 
 // Update Profile
 if (isset($_POST['update_profile'])) {
-  
-    $new_username = $_POST['username'];
+    $new_username = htmlspecialchars($_POST['username']);
     $profile_picture = $row['profile']; // Keep the current profile picture
 
     // Handle profile picture upload
@@ -65,7 +65,7 @@ if (isset($_POST['update_profile'])) {
         $imageFileType = strtolower(pathinfo($_FILES["profile_pic"]["name"], PATHINFO_EXTENSION));
         
         // Create a new filename based on the user's name
-        $new_filename = strtolower(str_replace(' ', '_', $name)) . '.' . $imageFileType; // Replace spaces with underscores
+        $new_filename = strtolower(str_replace(' ', '_', $new_username)) . '.' . $imageFileType; // Replace spaces with underscores
 
         // Check if image file is a actual image or fake image
         $check = getimagesize($_FILES["profile_pic"]["tmp_name"]);
@@ -100,7 +100,7 @@ if (isset($_POST['update_profile'])) {
 
     // Update the profile in the database
     $update_stmt = $conn->prepare("UPDATE admin SET profile = ? WHERE username = ?");
-    $update_stmt->bind_param("ss",  $profile_picture,$username);
+    $update_stmt->bind_param("ss", $profile_picture, $username);
 
     if ($update_stmt->execute()) {
         echo "<script>alert('Profile Updated Successfully');</script>";
@@ -137,11 +137,10 @@ if (isset($_POST['update_profile'])) {
                 <div class="card profile-card">
                     <div class="card-body d-flex flex-column align-items-center">
                         <div class="profile-pic">
-                            <img src="../admin/uploads/<?php echo !empty($row['profile']) ? $row['profile'] : 'default.jpeg'; ?>" alt="Profile" class="rounded-circle">
+                            <img src="../admin/uploads/<?php echo !empty($row['profile']) ? htmlspecialchars($row['profile']) : 'default.jpeg'; ?>" alt="Profile" class="rounded-circle">
                         </div>
                         
-                        <p class="profile-username"><?php echo $_SESSION['admin']; ?></p>
-                       
+                        <p class="profile-username"><?php echo strtoupper($username); ?></p>
                     </div>
                 </div>
             </div>
@@ -160,11 +159,10 @@ if (isset($_POST['update_profile'])) {
                         <div class="tab-content pt-2">
                             <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
                                 <form method="post" enctype="multipart/form-data">
-                                    
                                     <div class="row mb-3">
-                                        <label for="username" class="col-md-4 col-lg-3 col-form-label">username</label>
+                                        <label for="username" class="col-md-4 col-lg-3 col-form-label">Username</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="username" type="username" class="form-control" id="username" value="<?php echo $row['username']; ?>" readonly>
+                                            <input name="username" type="text" class="form-control" id="username" value="<?php echo htmlspecialchars($row['username']); ?>" readonly>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
@@ -184,19 +182,34 @@ if (isset($_POST['update_profile'])) {
                                     <div class="row mb-3">
                                         <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Current Password</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="old_pass" type="password" class="form-control" id="currentPassword" autocomplete="off" required>
+                                            <div class="input-group">
+                                                <input name="old_pass" type="password" class="form-control" id="currentPassword" autocomplete="off" required>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword')">
+                                                    <i class="fas fa-eye" id="eye-icon-current"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">New Password</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="new_pass" type="password" class="form-control" id="newPassword" autocomplete="off" required>
+                                            <div class="input-group">
+                                                <input name="new_pass" type="password" class="form-control" id="newPassword" autocomplete="off" required>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword')">
+                                                    <i class="fas fa-eye" id="eye-icon-new"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row mb-3">
                                         <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label">Re-enter New Password</label>
                                         <div class="col-md-8 col-lg-9">
-                                            <input name="con_pass" type="password" class="form-control" id="renewPassword" autocomplete="off" required>
+                                            <div class="input-group">
+                                                <input name="con_pass" type="password" class="form-control" id="renewPassword" autocomplete="off" required>
+                                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('renewPassword')">
+                                                    <i class="fas fa-eye" id="eye-icon-renew"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="text-center">
@@ -211,6 +224,23 @@ if (isset($_POST['update_profile'])) {
         </div>
     </section>
 </main>
+
+<script>
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const eyeIcon = document.getElementById('eye-icon-' + inputId);
+    
+    if (input.type === "password") {
+        input.type = "text";
+        eyeIcon.classList.remove("fa-eye");
+        eyeIcon.classList.add("fa-eye-slash");
+    } else {
+        input.type = "password";
+        eyeIcon.classList.remove("fa-eye-slash");
+        eyeIcon.classList.add("fa-eye");
+    }
+}
+</script>
 
 <?php
 include("footer.php"); // Include footer file

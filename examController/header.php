@@ -78,10 +78,7 @@ include("../include/connect.php");
           $result = mysqli_query($conn, $query);
           $num = mysqli_num_rows($result);
           ?>
-          <a class="nav-link nav-icon" href="" data-bs-toggle="dropdown">
-            <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number"><?php echo $num; ?></span>
-          </a>
+          
           <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <?php
             echo '<li class="dropdown-header">You have ' . $num . ' new notifications';
@@ -118,12 +115,7 @@ include("../include/connect.php");
             </a>
           </li>
           <li><hr class="dropdown-divider"></li>
-          <li>
-            <a class="dropdown-item d-flex align-items-center" href="pages-contact.php">
-              <i class="bi bi-question-circle"></i>
-              <span>Need Help?</span>
-            </a>
-          </li>
+          
           <li><hr class="dropdown-divider"></li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="logout.php">

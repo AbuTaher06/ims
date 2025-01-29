@@ -1,8 +1,19 @@
 <?php
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
+session_start();
+
+require_once '../vendor/autoload.php'; // Dompdf inclusion
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
+if (!isset($_SESSION['controller'])) {
+    header("Location: examcontroller_login.php");
+    exit();
 }
 include("../include/connect.php");
+
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 $pageTitle = "Exam Controller | Pending Exam Lists";
 include("header.php"); 
@@ -15,7 +26,7 @@ $session = isset($_GET['session']) ? $_GET['session'] : '';
 $semester = isset($_GET['semester']) ? $_GET['semester'] : '';
 
 // Build the SQL query with optional filters
-$pending_lists_query = "SELECT * FROM `exam_requests` WHERE sent_to_department = 'pending' AND reviewed_by_controller = 0";
+$pending_lists_query = "SELECT * FROM `exam_requests` WHERE sent_to_department = 'pending' AND sent_from_department='sent' AND reviewed_by_controller = 0";
 
 // Apply filters
 if (!empty($department)) {
@@ -57,11 +68,70 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
+
+// Handle PDF download request
+// Handle PDF download request
+if (isset($_GET['download_pdf'])) {
+  // Create a new Dompdf instance
+  $options = new Options();
+  $options->set('defaultFont', 'Courier');
+  $dompdf = new Dompdf($options);
+
+  // Fetch filtered results again for PDF generation
+  $pending_lists_result = mysqli_query($conn, $pending_lists_query);
+  
+  // Create HTML content for PDF
+  $html = '<h2>Pending Exam Requests</h2>';
+  $html .= '<table border="1" cellpadding="4" style="width: 100%; border-collapse: collapse;">
+              <tr>
+                  <th>#</th>
+                  <th>Department</th>
+                  <th>Student Name</th>
+                  <th>Student ID</th>
+                  <th>Session</th>
+                  <th>Course Code</th>
+                  <th>Course Title</th>
+                  <th>Year</th>
+                  <th>Semester</th>
+                  <th>Request Date</th>
+                  <th>View Transcript</th>
+              </tr>';
+     
+  // Add data to the table
+  while ($row = mysqli_fetch_assoc($pending_lists_result)) {
+      $html .= '<tr>
+                  <td>' . htmlspecialchars($row['id']) . '</td>
+                  <td>' . htmlspecialchars($row['department']) . '</td>
+                  <td>' . htmlspecialchars($row['student_name']) . '</td>
+                  <td>' . htmlspecialchars($row['student_id']) . '</td>
+                  <td>' . htmlspecialchars($row['session']) . '</td>
+                  <td>' . htmlspecialchars($row['course_code']) . '</td>
+                  <td>' . htmlspecialchars($row['course_title']) . '</td>
+                  <td>' . htmlspecialchars($row['year']) . '</td>
+                  <td>' . htmlspecialchars($row['semester']) . '</td>
+                  <td>' . htmlspecialchars($row['request_date']) . '</td>
+                  <td><a href="../student/transcripts/' . basename($row['transcript_path']) . '" target="_blank">View Transcript</a></td>
+                </tr>';
+  }
+  $html .= '</table>';
+
+  // Load HTML content to Dompdf
+  $dompdf->loadHtml($html);
+  // Set paper size and orientation
+  $dompdf->setPaper('A4', 'landscape');
+  // Render the HTML as PDF
+  $dompdf->render();
+  
+  // Output the generated PDF to browser
+  $dompdf->stream('pending_exam_requests.pdf', ['Attachment' => true]);
+  exit();
+}
+
 ?>
 
 <main id="main" class="main">
   <div class="pagetitle">
-    <h1>Pending Exam Participation Lists</h1>
+    <h1>Pending Improvement Application</h1>
   </div><!-- End Page Title -->
 
   <div class="row">
@@ -69,6 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <div class="card">
         <div class="card-header">
           <h5>Pending Lists</h5>
+          <!-- Download PDF Button -->
+          <a href="?download_pdf=1&department=<?php echo urlencode($department); ?>&year=<?php echo urlencode($year); ?>&session=<?php echo urlencode($session); ?>&semester=<?php echo urlencode($semester); ?>" class="btn btn-primary float-right">Download PDF</a>
         </div>
         <div class="card-body">
 
@@ -80,8 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <select name="department" id="department" class="form-control" onchange="submitForm()">
                   <option value="">Select Department</option>
                   <?php while($dept = mysqli_fetch_assoc($department_result)): ?>
-                    <option value="<?php echo $dept['username']; ?>" <?php if($department == $dept['username']) echo 'selected'; ?>>
-                      <?php echo $dept['dept_name']; ?>
+                    <option value="<?php echo htmlspecialchars($dept['username']); ?>" <?php if($department == $dept['username']) echo 'selected'; ?>>
+                      <?php echo htmlspecialchars($dept['dept_name']); ?>
                     </option>
                   <?php endwhile; ?>
                 </select>
@@ -128,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               <thead>
                 <tr>
                   <th><input type="checkbox" id="selectAll"><label for="selectAll">Select All</label></th>
-                  <th>ID</th>
+                  <th>#</th>
                   <th>Department</th>
                   <th>Student Name</th>
                   <th>Student ID</th>
@@ -143,22 +215,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </tr>
               </thead>
               <tbody>
-                <?php if (mysqli_num_rows($pending_lists_result) > 0): ?>
+                <?php if (mysqli_num_rows($pending_lists_result) > 0): 
+                  $counter = 1;
+                  ?>
                   <?php while ($row = mysqli_fetch_assoc($pending_lists_result)): ?>
                     <tr>
-                      <td><input type="checkbox" name="selected_ids[]" value="<?php echo $row['id']; ?>"></td>
-                      <td><?php echo $row['id']; ?></td>
-                      <td><?php echo $row['department']; ?></td>
-                      <td><?php echo $row['student_name']; ?></td>
-                      <td><?php echo $row['student_id']; ?></td>
-                      <td><?php echo $row['session']; ?></td>
-                      <td><?php echo $row['course_code']; ?></td>
-                      <td><?php echo $row['course_title']; ?></td>
-                      <td><?php echo $row['year']; ?></td>
-                      <td><?php echo $row['semester']; ?></td>
-                      <td><?php echo $row['request_date']; ?></td>
-                      <td><a href="review.php?id=<?php echo $row['id']; ?>" class="btn btn-warning"><i class="fas fa-eye"></i> Review</a></td>
-                      <td><a href="transcript.php?id=<?php echo $row['student_id']; ?>" class="btn btn-info"><i class="fas fa-file-alt"></i> View Transcript</a></td>
+                      <td><input type="checkbox" name="selected_ids[]" value="<?php echo htmlspecialchars($row['id']); ?>"></td>
+                      <td><?php echo $counter++; ?></td>
+                      <td><?php echo htmlspecialchars($row['department']); ?></td>
+                      <td><?php echo htmlspecialchars($row['student_name']); ?></td>
+                      <td><?php echo htmlspecialchars($row['student_id']); ?></td>
+                      <td><?php echo htmlspecialchars($row['session']); ?></td>
+                      <td><?php echo htmlspecialchars($row['course_code']); ?></td>
+                      <td><?php echo htmlspecialchars($row['course_title']); ?></td>
+                      <td><?php echo htmlspecialchars($row['year']); ?></td>
+                      <td><?php echo htmlspecialchars($row['semester']); ?></td>
+                      <td><?php echo htmlspecialchars($row['request_date']); ?></td>
+                      <td><a href="review.php?id=<?php echo htmlspecialchars($row['id']); ?>" class="btn btn-warning"><i class="fas fa-eye"></i> Review</a></td>
+                      <td>
+                        <a href="../student/transcripts/<?php echo basename($row['transcript_path']); ?>" target="_blank">
+                          <i class="fas fa-file-alt"></i> View Transcript
+                        </a>
+                      </td>
                     </tr>
                   <?php endwhile; ?>
                 <?php else: ?>
@@ -192,19 +270,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <?php endif; ?>
 </main>
 
-<?php include("footer.php"); ?>
-
 <script>
   function submitForm() {
     document.getElementById('filterForm').submit();
   }
+  
   document.getElementById('selectAll').addEventListener('change', function() {
     const checkboxes = document.querySelectorAll('input[name="selected_ids[]"]');
     checkboxes.forEach(checkbox => {
       checkbox.checked = this.checked;
     });
   });
+
   setTimeout(function() {
-    $('#flash-message').fadeOut('slow');
+    const flashMessages = document.querySelectorAll('#flash-message');
+    flashMessages.forEach(msg => {
+      msg.style.display = 'none';
+    });
   }, 5000);
 </script>
+
+<?php include("footer.php"); ?>

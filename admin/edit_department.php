@@ -68,8 +68,16 @@ if (isset($_GET['dept_name'])) {
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" name="password" class="form-control" value="<?php echo htmlspecialchars($department['password']); ?>" required>
+                <div class="input-group">
+                    <input type="password" name="password" id="password" class="form-control" value="<?php echo htmlspecialchars($department['password']); ?>" required>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
+
             <div class="form-group">
                 <label for="img">Profile Image</label>
                 <input type="file" name="img" class="form-control">
@@ -79,3 +87,19 @@ if (isset($_GET['dept_name'])) {
         </form>
     </div>
 </main>
+<script>
+    document.getElementById('togglePassword').addEventListener('click', function () {
+        const passwordField = document.getElementById('password');
+        const icon = this.querySelector('i');
+        // Toggle the password field type
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
+</script>

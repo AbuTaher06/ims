@@ -76,20 +76,7 @@ include("../include/connect.php");
           $result = mysqli_query($conn, $query);
           $num = mysqli_num_rows($result);
           ?>
-          <a class="nav-link nav-icon" href="" data-bs-toggle="dropdown">
-            <i class="bi bi-bell"></i>
-            <span class="badge bg-primary badge-number"><?php echo $num; ?></span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-            <?php
-            echo '<li class="dropdown-header">You have ' . $num . ' new notifications';
-            echo '<a href="student_request.php"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a></li>';
-            ?>
-            <li><hr class="dropdown-divider"></li>
-            <!-- <li class="dropdown-footer">
-              <a href="#">Your Complaint is Approved</a>
-            </li> -->
-          </ul>
+         
         </li>
       
         <?php
@@ -101,7 +88,7 @@ include("../include/connect.php");
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="users-profile.php" data-bs-toggle="dropdown">
         <img src="uploads/<?php echo $row['profile']; ?>" alt="Profile" class="rounded-circle">
 
-          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $username;?></span>
+          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo strtoupper($username);?></span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
           <li class="dropdown-header">

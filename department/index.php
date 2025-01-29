@@ -103,7 +103,7 @@ $dept_name=$dept_row['dept_name'];
         <div class="card-body">
           <?php
           $dept = $_SESSION['dept'];
-          $review_status = mysqli_query($conn, "SELECT * FROM exam_requests WHERE sent_from_department<>'pending' AND department='$dept'");
+          $review_status = mysqli_query($conn, "SELECT * FROM exam_requests WHERE sent_from_department<>'pending' and (sent_to_department='approved' OR sent_to_department='rejected')  AND department='$dept'");
           $num = mysqli_num_rows($review_status);        
           ?>
           <h5 class="card-title"><i class="fas fa-check-circle"></i> Status of Improvement Application</h5>
@@ -153,7 +153,7 @@ $dept_name=$dept_row['dept_name'];
       <div class="card text-center bg-success">
         <div class="card-body">
           <?php
-          $selected_for_improvement = mysqli_query($conn, "SELECT * FROM exam_requests WHERE sent_to_department='sent' AND reviewed_by_controller='1' AND department='$dept'");
+          $selected_for_improvement = mysqli_query($conn, "SELECT * FROM exam_requests WHERE sent_from_department='sent' AND reviewed_by_controller='1' and sent_to_department='approved' AND department='$dept'");
           $selected_count = mysqli_num_rows($selected_for_improvement);
           ?>
           <h5 class="card-title"><i class="fas fa-thumbs-up"></i> Selected for Improvement</h5>
@@ -168,7 +168,7 @@ $dept_name=$dept_row['dept_name'];
         <div class="card text-center bg-warning">
           <div class="card-body">
             <?php
-            $rejected_for_improvement = mysqli_query($conn, "SELECT * FROM exam_requests WHERE sent_to_department='rejected' AND reviewed_by_controller='1'  AND department='$dept'");
+            $rejected_for_improvement = mysqli_query($conn, "SELECT * FROM exam_requests WHERE sent_to_department='rejected' AND reviewed_by_controller='1' and sent_from_department='sent'  AND department='$dept'");
             $rejected_count = mysqli_num_rows($rejected_for_improvement);
             ?>
             <h5 class="card-title"><i class="fas fa-thumbs-down"></i> Rejected for Improvement</h5>

@@ -43,14 +43,14 @@ include("../include/connect.php");
 <body>
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <div class="d-flex align-items-center justify-content-between">
-      <a href="index.php" class="logo d-flex align-items-center">
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="index.php" class="logo d-flex align-items-center" style="text-decoration: none;">
         <img src="assets/img/logo.png" alt="">
-        <span class="d-none d-lg-block">Course Improvement Management System
-        </span>
-      </a>
-      <i class="bi bi-list toggle-sidebar-btn"></i>
-    </div>
+        <span class="d-none d-lg-block">Course Improvement Management System</span>
+    </a>
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+</div>
+
     <!-- <div class="search-bar">
       <form class="search-form d-flex align-items-center" method="POST" action="#">
         <input type="text" name="query" placeholder="Search" title="Enter search keyword">
@@ -69,20 +69,20 @@ include("../include/connect.php");
           $result = mysqli_query($conn, $query);
           $num = mysqli_num_rows($result);
           ?>
-          <a class="nav-link nav-icon" href="" data-bs-toggle="dropdown">
+          <!-- <a class="nav-link nav-icon" href="" data-bs-toggle="dropdown">
             <i class="bi bi-bell"></i>
             <span class="badge bg-primary badge-number"><?php echo $num; ?></span>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
-            <?php
-            echo '<li class="dropdown-header">You have ' . $num . ' new notifications';
-            echo '<a href="view_reports.php"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a></li>';
-            ?>
-            <li><hr class="dropdown-divider"></li>
+          </a> -->
+          <!-- <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+          <?php
+           // echo '<li class="dropdown-header">You have ' . $num . ' new notifications';
+          //  echo '<a href="view_reports.php"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a></li>';
+            ?>  -->
+            <!-- <li><hr class="dropdown-divider"></li> -->
             <!-- <li class="dropdown-footer">
               <a href="#">Your Complaint is Approved</a>
-            </li> -->
-          </ul>
+            </li> 
+          </ul> -->
         </li>
       
         <?php

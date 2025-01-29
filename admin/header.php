@@ -38,6 +38,7 @@ include("../include/connect.php");
   <!-- Template Main CSS File -->
   <link href="../admin/assets/css/style.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
 
 </head>
 <body>
@@ -59,9 +60,9 @@ include("../include/connect.php");
     </div> -->
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">
-        <li class="nav-item d-block d-lg-none">
+        <!-- <li class="nav-item d-block d-lg-none">
           <a class="nav-link nav-icon search-bar-toggle" href="#"><i class="bi bi-search"></i></a>
-        </li>
+        </li> -->
         <li class="nav-item dropdown">
           <?php
         $username=$_SESSION['admin'];
@@ -81,7 +82,7 @@ include("../include/connect.php");
         <a class="nav-link nav-profile d-flex align-items-center pe-0" href="users-profile.php" data-bs-toggle="dropdown">
         <img src="../admin/uploads/<?php echo $row['profile']; ?>" alt="Profile" class="rounded-circle">
 
-          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $row['username'];?></span>
+          <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo strtoupper($row['username']);?></span>
         </a>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
           <li class="dropdown-header">
@@ -96,12 +97,12 @@ include("../include/connect.php");
             </a>
           </li>
           <li><hr class="dropdown-divider"></li>
-          <li>
+          <!-- <li>
             <a class="dropdown-item d-flex align-items-center" href="pages-contact.php">
               <i class="bi bi-question-circle"></i>
               <span>Need Help?</span>
             </a>
-          </li>
+          </li> -->
           <li><hr class="dropdown-divider"></li>
           <li>
             <a class="dropdown-item d-flex align-items-center" href="logout.php">

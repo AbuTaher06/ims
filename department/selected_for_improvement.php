@@ -20,7 +20,7 @@ $filter_session = $_GET['session'] ?? '';
 $filter_year = $_GET['year'] ?? '';
 $filter_semester = $_GET['semester'] ?? ''; // Assuming semester is also a filter
 
-$filter_conditions = "WHERE `sent_to_department` = 'sent' AND `department` = '$dept' AND `reviewed_by_controller` = '1'";
+$filter_conditions = "WHERE `sent_from_department` = 'sent' AND `department` = '$dept' AND `reviewed_by_controller` = '1' and sent_to_department = 'approved'";
 if ($filter_session) {
     $filter_conditions .= " AND `session` = '" . mysqli_real_escape_string($conn, $filter_session) . "'";
 }
@@ -51,7 +51,61 @@ $semesters_list = mysqli_fetch_all($semesters_result, MYSQLI_ASSOC);
 // Handle PDF download
 if (isset($_GET['download_pdf'])) {
     $dompdf = new Dompdf();
-    ob_end_clean();
+    ob_start();
+    // Building the header with logo
+    if (isset($_GET['download_pdf'])) {
+        ob_start(); // Start output buffering
+        $dompdf = new Dompdf();
+    
+        // Building the HTML content
+        $html = '
+        <div style="text-align: center; margin-bottom: 20px; position: relative;">
+            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                <div style="text-align: right; flex: 1;">
+                    <h2 style="margin: 0;">Dept. of ' . htmlspecialchars($dept_name) . '</h2>
+                    <p style="margin: 0; font-size: 14px;">Jatiya Kabi Kazi Nazrul Islam University</p>
+                    <p style="margin: 0; font-size: 12px;">Trishal, Mymensingh - 2224, Bangladesh</p>
+                </div>
+                // <div style="flex-shrink: 0; margin: 0 15px;">
+                //     <img src="/absolute/path/to/asset/images/jkkniu.png" alt="Logo" style="width: 80px; height: 80px; display: block; margin: auto;">
+                // </div>
+                <div style="text-align: left; flex: 1;">
+                    <h2 style="margin: 0;">কম্পিউটার বিজ্ঞান ও প্রকৌশল বিভাগ</h2>
+                    <p style="margin: 0; font-size: 14px;">জাতীয় কবি কাজী নজরুল ইসলাম বিশ্ববিদ্যালয়</p>
+                    <p style="margin: 0; font-size: 12px;">ত্রিশাল, ময়মনসিংহ - ২২২৪, বাংলাদেশ</p>
+                </div>
+            </div>
+            <hr style="border: 1px solid black; margin: 10px 0;">
+        </div>';
+        ob_end_clean(); // Clean the output buffer and stop output buffering
+    
+        $html .= '<h1 style="text-align:center;">Approved Exam Participation List</h1>';
+        $html .= '<table border="1" cellspacing="0" cellpadding="5" style="width:100%;">';
+        $html .= '<thead><tr><th>#</th><th>Student Name</th><th>Student ID</th><th>Session</th><th>Course Code</th><th>Course Title</th><th>Course Credit</th><th>Year</th><th>Semester</th></tr></thead><tbody>';
+    
+        $counter = 0;
+        foreach ($approved_list_data as $row) {
+            $html .= '<tr><td>' . ++$counter . '</td><td>' . htmlspecialchars($row['student_name']) . '</td>';
+            $html .= '<td>' . htmlspecialchars($row['student_id']) . '</td><td>' . htmlspecialchars($row['session']) . '</td>';
+            $html .= '<td>' . htmlspecialchars($row['course_code']) . '</td><td>' . htmlspecialchars($row['course_title']) . '</td>';
+            $html .= '<td>' . htmlspecialchars($row['course_credit']) . '</td><td>' . htmlspecialchars($row['year']) . '</td>';
+            $html .= '<td>' . htmlspecialchars($row['semester']) . '</td></tr>';
+        }
+        $html .= '</tbody></table>';
+    
+        // Load HTML and render
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+    
+        // Stream the PDF
+        $filename = 'approved_participation_list.pdf';
+        $dompdf->stream($filename, ['Attachment' => true]);
+        exit();
+    }
+    
+
+
     $html = '<h1 style="text-align:center;">Approved Exam Participation List</h1>';
     $html .= '<table border="1" cellspacing="0" cellpadding="5" style="width:100%;">';
     $html .= '<thead><tr><th>#</th><th>Student Name</th><th>Student ID</th><th>Session</th><th>Course Code</th><th>Course Title</th><th>Course Credit</th><th>Year</th><th>Semester</th></tr></thead><tbody>';
